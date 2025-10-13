@@ -1,7 +1,4 @@
-# ================================================================
-# 🧩 CUSTOMER SEGMENTATION DASHBOARD (with LOGIN)
-# ================================================================
-import streamlit as st
+import app as st
 import pandas as pd
 import numpy as np
 import joblib
@@ -10,9 +7,6 @@ from sklearn.preprocessing import MinMaxScaler
 from math import pi
 import os
 
-# ================================================================
-# 1️⃣ PAGE CONFIG
-# ================================================================
 st.set_page_config(
     page_title="Customer Segmentation Dashboard",
     layout="wide",
@@ -28,15 +22,11 @@ AUTHORIZED_USERS = {
     "manager": "securepass456"
 }
 
-# ================================================================
-# 3️⃣ SESSION STATE MANAGEMENT
-# ================================================================
+# SESSION STATE MANAGEMENT
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
-# ================================================================
-# 4️⃣ LOGIN FUNCTION
-# ================================================================
+# LOGIN FUNCTION
 def login():
     st.title("🔐 Secure Login")
     st.markdown("Only authorized users can access the segmentation dashboard.")
@@ -53,17 +43,13 @@ def login():
         else:
             st.error("❌ Invalid username or password")
 
-# ================================================================
-# 5️⃣ LOGOUT FUNCTION
-# ================================================================
+# LOGOUT FUNCTION
 def logout():
     st.session_state.authenticated = False
     st.success("👋 You have been logged out.")
     st.rerun()
 
-# ================================================================
-# 6️⃣ MAIN DASHBOARD FUNCTION
-# ================================================================
+# MAIN DASHBOARD FUNCTION
 def main_dashboard():
     st.title("🧩 Customer Segmentation System")
     st.sidebar.button("🚪 Logout", on_click=logout)
@@ -157,9 +143,7 @@ def main_dashboard():
     st.dataframe(cluster_profiles)
     st.caption("These represent the normalized behavior of each customer cluster.")
 
-# ================================================================
-# 7️⃣ LOGIN LOGIC
-# ================================================================
+# LOGIN LOGIC
 if not st.session_state.authenticated:
     login()
 else:
