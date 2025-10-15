@@ -48,16 +48,21 @@ def load_raw_data():
 @st.cache_resource
 def load_models():
     if not os.path.exists('models'):
-        return None, None, None, None
+        return None, None, None, None, None
     try:
         scaler = joblib.load('models/scaler.pkl')
         pca = joblib.load('models/pca.pkl')
         clusterer = joblib.load('models/clusterer.pkl')
         profiles = pd.read_csv('models/cluster_profiles.csv', index_col=0)
-        return scaler, pca, clusterer, profiles
+        # Try to load supervised classifier (Random Forest)
+        try:
+            rf_model = joblib.load('models/segment_classifier.pkl')
+        except:
+            rf_model = None
+        return scaler, pca, clusterer, profiles, rf_model
     except Exception as e:
         st.error(f"Model loading failed: {e}")
-        return None, None, None, None
+        return None, None, None, None, None
 
 # =============================================================================
 # Login Page
@@ -89,13 +94,14 @@ with col2:
         st.rerun()
 
 # =============================================================================
-# Global Constants (MUST match training)
+# Global Constants
 # =============================================================================
 FEATURES = [
     'Age', 'Income', 'Has_Children', 'TotalMnt', 'TotalPurchases',
     'NumWebVisitsMonth', 'TotalAcceptedCmp', 'Days_Customer'
 ]
 
+# For unsupervised clusters
 CLUSTER_DESCRIPTIONS = {
     0: "Budget-Conscious Browsers: Low income, high web visits, low spending",
     1: "Loyal High-Spenders: High income, high spending, low discount usage",
@@ -110,8 +116,21 @@ CLUSTER_MARKETING = {
     3: "• Reactivation campaigns (special offers)\n• Survey to understand churn reasons\n• Re-engage with personalized content"
 }
 
+# For supervised segments
+SEGMENT_DESCRIPTIONS = {
+    'Low': "Budget-conscious shoppers with limited spending",
+    'Medium': "Moderate spenders with balanced engagement",
+    'High': "High-value customers with premium purchasing behavior"
+}
+
+SEGMENT_MARKETING = {
+    'Low': "• Offer entry-level products\n• Use price-based promotions\n• Build trust through education",
+    'Medium': "• Cross-sell complementary items\n• Introduce loyalty programs\n• Share user testimonials",
+    'High': "• Provide VIP treatment\n• Offer early access to new products\n• Personalize high-touch service"
+}
+
 # =============================================================================
-# Preprocessing Function (MIRROR JUPYTER)
+# Preprocessing Function
 # =============================================================================
 def preprocess_for_eda(df_raw):
     df = df_raw.copy()
@@ -144,12 +163,11 @@ page = st.sidebar.radio("Go to", ["Home", "Customer Dashboard", "Predict Custome
 
 # =============================================================================
 # HOME PAGE
-# =============================================================================
 if page == "Home":
     st.title("🏠 Welcome to the Customer Segmentation System")
     st.markdown("""
     ## 🎯 Introduction
-    This system segments retail customers into distinct behavioral groups using unsupervised machine learning.
+    Helping uncover hidden patterns of customer behavior in grocery retail using machine learning techniques. By analyzing relevant factors like income, spending habits, family size, and recency of purchases, the app groups customers into meaningful segments. These clusters make it easier to understand who your customers really are — from loyal big spenders to budget-conscious shoppers. The app transforms raw marketing data into clear insights. The goal? To help businesses make smarter, more personalized decisions and connect with their customers on a deeper level.
     """)
     
     st.markdown("---")
@@ -173,15 +191,16 @@ if page == "Home":
     st.markdown("---")
     st.subheader("💡 Why Segment Customers?")
     st.markdown("""
-    - Deliver **personalized experiences**
+    - Improve **decision making**
+    - Identify **high-value customers**
+    - Deliver **personalized customer experiences**
     - Increase **marketing ROI**
-    - Reduce **customer churn**
+    - Reduce **customer churn rate**
     - Guide **product development**
     """)
 
 # =============================================================================
 # CUSTOMER DASHBOARD
-# =============================================================================
 elif page == "Customer Dashboard":
     st.title("📈 Customer Dashboard")
     
@@ -189,7 +208,6 @@ elif page == "Customer Dashboard":
     if df_raw is not None:
         df_eda = preprocess_for_eda(df_raw)
         
-        # === KPI CARDS ===
         avg_spent = df_eda['TotalMnt'].mean()
         avg_age = df_eda['Age'].mean()
         avg_income = df_eda['Income'].mean()
@@ -214,62 +232,73 @@ elif page == "Customer Dashboard":
         if df_raw is not None:
             st.markdown("## 📊 Exploratory Data Analysis")
             
+            PRIMARY_COLOR = "#007BFF"
+            BACKGROUND_COLOR = "#F0F2F6"
+            
             col1, col2 = st.columns(2)
             with col1:
-                fig, ax = plt.subplots()
-                ax.hist(df_eda['Age'], bins=20, color='skyblue', edgecolor='black')
-                ax.set_title('Age Distribution')
+                fig, ax = plt.subplots(facecolor=BACKGROUND_COLOR)
+                ax.hist(df_eda['Age'], bins=20, color=PRIMARY_COLOR, edgecolor='white', alpha=0.8)
+                ax.set_title('Age Distribution', fontsize=14, fontweight='bold')
+                ax.set_facecolor(BACKGROUND_COLOR)
                 st.pyplot(fig)
             with col2:
-                fig, ax = plt.subplots()
-                ax.hist(df_eda['Income'], bins=30, color='lightgreen', edgecolor='black')
-                ax.set_title('Income Distribution')
+                fig, ax = plt.subplots(facecolor=BACKGROUND_COLOR)
+                ax.hist(df_eda['Income'], bins=30, color=PRIMARY_COLOR, edgecolor='white', alpha=0.8)
+                ax.set_title('Income Distribution', fontsize=14, fontweight='bold')
+                ax.set_facecolor(BACKGROUND_COLOR)
                 st.pyplot(fig)
             
             col1, col2 = st.columns(2)
             with col1:
                 spending_cols = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
                 spending_means = df_eda[spending_cols].mean()
-                fig, ax = plt.subplots()
-                spending_means.plot(kind='bar', ax=ax, color='coral')
-                ax.set_ylabel('Average Spending ($)')
-                ax.set_title('Spending by Category')
-                plt.xticks(rotation=45)
+                colors = plt.cm.Blues(np.linspace(0.4, 1.0, len(spending_means)))
+                fig, ax = plt.subplots(facecolor=BACKGROUND_COLOR)
+                ax.bar(spending_means.index, spending_means.values, color=colors, edgecolor='white')
+                ax.set_ylabel('Average Spending ($)', fontweight='bold')
+                ax.set_title('Spending by Category', fontsize=14, fontweight='bold')
+                ax.set_facecolor(BACKGROUND_COLOR)
+                plt.xticks(rotation=45, ha='right')
                 st.pyplot(fig)
             with col2:
                 campaign_cols = ['AcceptedCmp1','AcceptedCmp2','AcceptedCmp3','AcceptedCmp4','AcceptedCmp5','Response']
                 acceptance_rates = df_eda[campaign_cols].mean() * 100
-                fig, ax = plt.subplots()
-                acceptance_rates.plot(kind='bar', ax=ax, color='purple')
-                ax.set_ylabel('Acceptance Rate (%)')
-                ax.set_title('Campaign Acceptance')
-                plt.xticks(rotation=45)
+                colors = plt.cm.Purples(np.linspace(0.4, 1.0, len(acceptance_rates)))
+                fig, ax = plt.subplots(facecolor=BACKGROUND_COLOR)
+                ax.bar(acceptance_rates.index, acceptance_rates.values, color=colors, edgecolor='white')
+                ax.set_ylabel('Acceptance Rate (%)', fontweight='bold')
+                ax.set_title('Campaign Acceptance', fontsize=14, fontweight='bold')
+                ax.set_facecolor(BACKGROUND_COLOR)
+                plt.xticks(rotation=45, ha='right')
                 st.pyplot(fig)
             
             col1, col2 = st.columns(2)
             with col1:
                 edu_counts = df_eda['Education'].value_counts()
-                fig, ax = plt.subplots()
-                ax.pie(edu_counts.values, labels=edu_counts.index, autopct='%1.1f%%')
-                ax.set_title('Education Levels')
+                colors = plt.cm.Blues(np.linspace(0.4, 1.0, len(edu_counts)))
+                fig, ax = plt.subplots(facecolor=BACKGROUND_COLOR)
+                ax.pie(edu_counts.values, labels=edu_counts.index, autopct='%1.1f%%', colors=colors)
+                ax.set_title('Education Levels', fontsize=14, fontweight='bold')
                 st.pyplot(fig)
             with col2:
                 marital_counts = df_eda['Marital_Status'].value_counts()
-                fig, ax = plt.subplots()
-                ax.bar(marital_counts.index, marital_counts.values, color='gold')
-                ax.set_title('Marital Status')
-                plt.xticks(rotation=45)
+                colors = plt.cm.Greens(np.linspace(0.4, 1.0, len(marital_counts)))
+                fig, ax = plt.subplots(facecolor=BACKGROUND_COLOR)
+                ax.bar(marital_counts.index, marital_counts.values, color=colors, edgecolor='white')
+                ax.set_title('Marital Status', fontsize=14, fontweight='bold')
+                ax.set_facecolor(BACKGROUND_COLOR)
+                plt.xticks(rotation=45, ha='right')
                 st.pyplot(fig)
         else:
             st.error("Dataset not found.")
     
     # Tab 2: Clustering Results
     with tab2:
-        scaler, pca, clusterer, cluster_profiles = load_models()
+        scaler, pca, clusterer, cluster_profiles, rf_model = load_models()
         if cluster_profiles is not None:
             st.markdown(f"## 🧩 Clustering Results ({len(cluster_profiles)} Segments)")
             
-            # Radar Charts
             st.markdown("### 📡 Cluster Profiles")
             n_clusters = len(cluster_profiles)
             cols = st.columns(min(4, n_clusters))
@@ -291,7 +320,6 @@ elif page == "Customer Dashboard":
                     ax.set_ylim(0, 1)
                     st.pyplot(fig)
             
-            # Feature Heatmap
             st.markdown("### 🌡️ Feature Heatmap (Normalized)")
             fig, ax = plt.subplots(figsize=(10, max(4, n_clusters)))
             sns.heatmap(cluster_profiles, annot=True, cmap="YlGnBu", fmt=".2f", ax=ax)
@@ -311,11 +339,11 @@ elif page == "Customer Dashboard":
             st.markdown("---")
 
 # =============================================================================
-# PREDICT TAB
+# PREDICT TAB (Now uses Random Forest if available)
 # =============================================================================
 elif page == "Predict Customer Segment":
     st.title("🔮 Predict Customer Segment")
-    scaler, pca, clusterer, cluster_profiles = load_models()
+    scaler, pca, clusterer, cluster_profiles, rf_model = load_models()
     if scaler is None:
         st.error("Models not loaded. Train and save models first.")
         st.stop()
@@ -339,28 +367,29 @@ elif page == "Predict Customer Segment":
                                 web_visits, total_cmp, days_customer]])
         try:
             scaled = scaler.transform(input_data)
-            reduced = pca.transform(scaled)
-            cluster_id = int(clusterer.predict(reduced)[0])
             
-            st.success(f"### 🎯 Predicted Segment: **Cluster {cluster_id}**")
-            st.info(f"**Profile**: {CLUSTER_DESCRIPTIONS.get(cluster_id, 'Unknown')}")
-            
-            # Comparison
-            customer_norm = pd.DataFrame(scaled, columns=FEATURES)
-            cluster_norm = cluster_profiles.loc[cluster_id:cluster_id]
-            comparison_df = pd.DataFrame({
-                'Customer': customer_norm.iloc[0].values,
-                'Cluster Average': cluster_norm.iloc[0].values
-            }, index=FEATURES)
-            st.dataframe(comparison_df.style.format("{:.2f}"))
-            
-            st.markdown("### 💼 Recommended Strategy")
-            st.markdown(CLUSTER_MARKETING.get(cluster_id, "No strategy available"))
+            if rf_model is not None:
+                # ✅ Use Random Forest (supervised)
+                pred_label = rf_model.predict(scaled)[0]
+                label_map_rev = {0: 'Low', 1: 'Medium', 2: 'High'}
+                segment_name = label_map_rev[pred_label]
+                st.success(f"### 🎯 Predicted Segment: **{segment_name}**")
+                st.info(f"**Profile**: {SEGMENT_DESCRIPTIONS.get(segment_name, 'N/A')}")
+                st.markdown("### 💼 Recommended Strategy")
+                st.markdown(SEGMENT_MARKETING.get(segment_name, "No strategy available"))
+            else:
+                # ❌ Fall back to KMeans (unsupervised)
+                reduced = pca.transform(scaled)
+                cluster_id = int(clusterer.predict(reduced)[0])
+                st.success(f"### 🎯 Predicted Cluster: **Cluster {cluster_id}**")
+                st.info(f"**Profile**: {CLUSTER_DESCRIPTIONS.get(cluster_id, 'Unknown')}")
+                st.markdown("### 💼 Recommended Strategy")
+                st.markdown(CLUSTER_MARKETING.get(cluster_id, "No strategy available"))
+                
         except Exception as e:
             st.error(f"Prediction error: {e}")
 
 # =============================================================================
 # Footer
-# =============================================================================
 st.markdown("---")
-st.caption("💡 Powered by unsupervised machine learning on the Customer Personality Analysis dataset.")
+st.caption("💡 Powered by machine learning on the Customer Personality Analysis dataset.")
