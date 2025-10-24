@@ -4,12 +4,14 @@ import pandas as pd
 import numpy as np
 import joblib
 import os
+import json
 from math import pi
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
+from scipy.stats import gaussian_kde
 
 # =============================================================================
-# Configuration & Constants (Updated with Brand Colors)
+# Configuration & Constants
 # =============================================================================
 CONFIG = {
     "features": [
@@ -33,25 +35,37 @@ CONFIG = {
         1: "• Upsell premium items\n• Offer exclusive access\n• Emphasize quality"
     },
     "colors": {
-        "background": "#FAFAFA",       # Off-white
-        "text_primary": "#333333",     # Dark Gray
-        "accent": "#FF9800",           # Tangerine Orange
-        "accent_hover": "#E65100",     # Burnt Orange
-        "card_bg": "#FFF3E0",          # Light Cream
-        "border": "#E0E0E0"            # Soft Gray
+        "background": "#FFF3E0",      
+        "text_primary": "#333333",
+        "accent": "#4260C1",
+        "accent_hover": "#272278",
+        "card_bg": "#F6DEBA",          
+        "border": "#E0E0E0"
     }
 }
 
 FEATURES = CONFIG["features"]
 COLORS = CONFIG["colors"]
 
-# Set page config
+# Set page config with new background
+
 st.set_page_config(
     page_title="Customer Segmentation System",
     page_icon="🛒",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+st.markdown(f"""
+<style>
+    .stApp {{
+        background-color: {COLORS['background']} !important;
+    }}
+    h1, h2, h3, h4, h5, h6, p, div {{
+        color: {COLORS['text_primary']} !important;
+    }}
+</style>
+""", unsafe_allow_html=True)
 
 # =============================================================================
 # User Authentication
@@ -106,6 +120,14 @@ def load_models():
 
     return scaler, pca, clusterer, profiles, supervised_model
 
+@st.cache_data
+def load_model_metrics():
+    try:
+        with open('models/model_metrics.json', 'r') as f:
+            return json.load(f)
+    except:
+        return None
+
 # =============================================================================
 # Login Page
 # =============================================================================
@@ -139,10 +161,6 @@ with col2:
 # Preprocessing Function
 # =============================================================================
 def preprocess_for_eda(df_raw):
-    """
-    Clean and engineer features from raw marketing campaign data.
-    Returns a DataFrame ready for EDA or modeling.
-    """
     df = df_raw.copy()
     df = df.dropna(subset=['Income'])
     df["Age"] = 2024 - df["Year_Birth"]
@@ -175,7 +193,16 @@ page = st.sidebar.radio("Go to", ["Home", "Customer Dashboard", "Predict Custome
 # HOME PAGE
 # =============================================================================
 if page == "Home":
-    st.title("🏠 Welcome to the Customer Segmentation System")
+    # Banner
+    st.markdown(f"""
+    <div style="background-color: {COLORS['accent']}; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+        <h1 style="color: white; font-size: 2.5rem;">Discover What Drives Your Shoppers</h1>
+        <p style="color: white; font-size: 1.2rem; margin-top: 10px;">
+            Unlock actionable insights with AI-powered customer segmentation
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.markdown("""
     ## 🎯 Introduction
     This system segments customers into **two distinct groups** using machine learning:
@@ -193,13 +220,35 @@ if page == "Home":
         st.write(f"Records after cleaning: **{len(df_home)}**")
         st.dataframe(df_home[FEATURES].head(3))
         
+        # KPI Cards with colored background (same as dashboard)
+        avg_spent = df_home['TotalMnt'].mean()
+        avg_age = df_home['Age'].mean()
+        avg_income = df_home['Income'].mean()
+        
         col1, col2, col3 = st.columns(3)
+        kpi_style = f"background-color: {COLORS['card_bg']}; padding: 15px; border-radius: 8px; border-left: 5px solid {COLORS['accent']};"
+        
         with col1:
-            st.metric("Avg Income", f"${df_home['Income'].mean():,.0f}")
+            st.markdown(f"""
+            <div style="{kpi_style}">
+                <h4>💰 Avg. Spending</h4>
+                <p style="font-size: 20px; font-weight: bold;">${avg_spent:,.0f}</p>
+            </div>
+            """, unsafe_allow_html=True)
         with col2:
-            st.metric("Avg Age", f"{df_home['Age'].mean():.1f}")
+            st.markdown(f"""
+            <div style="{kpi_style}">
+                <h4>👤 Avg. Age</h4>
+                <p style="font-size: 20px; font-weight: bold;">{avg_age:.1f}</p>
+            </div>
+            """, unsafe_allow_html=True)
         with col3:
-            st.metric("Avg Spending", f"${df_home['TotalMnt'].mean():,.0f}")
+            st.markdown(f"""
+            <div style="{kpi_style}">
+                <h4>💳 Avg. Income</h4>
+                <p style="font-size: 20px; font-weight: bold;">${avg_income:,.0f}</p>
+            </div>
+            """, unsafe_allow_html=True)
     else:
         st.error("Dataset not found. Place `marketing_campaign.csv` in the project root.")
 
@@ -227,14 +276,12 @@ elif page == "Customer Dashboard":
     # Filters
     st.sidebar.header("🔍 Filters")
     
-    # Age Group Filter
     age_bins = [18, 30, 45, 60, 100]
     age_labels = ["18-29", "30-44", "45-59", "60+"]
     df_full['AgeGroup'] = pd.cut(df_full['Age'], bins=age_bins, labels=age_labels, right=False)
     
     selected_age_group = st.sidebar.selectbox("Age Group", ["All"] + list(age_labels))
     
-    # Income Range Filter
     min_income = int(df_full['Income'].min())
     max_income = int(df_full['Income'].max())
     income_range = st.sidebar.slider(
@@ -245,7 +292,6 @@ elif page == "Customer Dashboard":
         step=5000
     )
     
-    # Total Spending Filter
     min_spent = int(df_full['TotalMnt'].min())
     max_spent = int(df_full['TotalMnt'].max())
     spending_range = st.sidebar.slider(
@@ -256,7 +302,6 @@ elif page == "Customer Dashboard":
         step=100
     )
     
-    # Other Filters
     education_options = ["All"] + sorted(df_full['Education'].unique().tolist())
     selected_education = st.sidebar.selectbox("Education Level", education_options)
     marital_options = ["All"] + sorted(df_full['Marital_Status'].unique().tolist())
@@ -331,131 +376,331 @@ elif page == "Customer Dashboard":
     # Tab 1: Demographics
     with tab1:
         st.markdown("## 👥 Demographics")
+
         col1, col2 = st.columns(2)
         with col1:
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.hist(filtered_df['Age'], bins=20, color=COLORS["accent"], edgecolor=COLORS["border"], alpha=0.8)
-            ax.set_title('Age Distribution', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            st.pyplot(fig)
-        with col2:
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.hist(filtered_df['Income'], bins=30, color=COLORS["accent"], edgecolor=COLORS["border"], alpha=0.8)
-            ax.set_title('Income Distribution', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            st.pyplot(fig)
+        # Histogram
+            hist_data = filtered_df['Age']
+            kde = gaussian_kde(hist_data)
+            x_vals = np.linspace(hist_data.min(), hist_data.max(), 200)
+            y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 20  # Scale to histogram
+
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=hist_data,
+                nbinsx=20,
+                marker_color=COLORS["accent"],
+                opacity=0.7,
+                hovertemplate="<b>Age</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>",
+                name="Age"
+            ))
+            fig.add_trace(go.Scatter(
+                x=x_vals,
+                y=y_kde,
+                mode='lines',
+                line=dict(color=COLORS["accent_hover"], width=3),
+                name="Trend (KDE)"
+            ))
+            fig.update_layout(
+                title='Age Distribution',
+                xaxis_title='Age',
+                yaxis_title='Count',
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"]
+            )
+            st.plotly_chart(fig, use_container_width=True)
         
-        col1, col2 = st.columns(2)
-        with col1:
-            edu_counts = filtered_df['Education'].value_counts().sort_index()
-            colors = plt.cm.Oranges(np.linspace(0.4, 1.0, len(edu_counts)))
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.bar(edu_counts.index, edu_counts.values, color=colors, edgecolor=COLORS["border"])
-            ax.set_title('Education Level', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            plt.xticks(rotation=45, ha='right')
-            st.pyplot(fig)
         with col2:
-            mar_counts = filtered_df['Marital_Status'].value_counts().sort_index()
-            colors = plt.cm.Greens(np.linspace(0.4, 1.0, len(mar_counts)))
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.bar(mar_counts.index, mar_counts.values, color=colors, edgecolor=COLORS["border"])
-            ax.set_title('Marital Status', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            plt.xticks(rotation=45, ha='right')
-            st.pyplot(fig)
-    
+            hist_data = filtered_df['Income']
+            kde = gaussian_kde(hist_data)
+            x_vals = np.linspace(hist_data.min(), hist_data.max(), 200)
+            y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 30
+
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=hist_data,
+                nbinsx=30,
+                marker_color=COLORS["accent"],
+                opacity=0.7,
+                hovertemplate="<b>Income</b>: $%{x:,.0f}<br><b>Count</b>: %{y}<extra></extra>",
+                name="Income"
+            ))
+            fig.add_trace(go.Scatter(
+                x=x_vals,
+                y=y_kde,
+                mode='lines',
+                line=dict(color=COLORS["accent_hover"], width=3),
+                name="Trend (KDE)"
+            ))
+            fig.update_layout(
+                title='Income Distribution',
+                xaxis_title='Income ($)',
+                yaxis_title='Count',
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"]
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            edu_counts = filtered_df['Education'].value_counts().reset_index()
+            edu_counts.columns = ['Education', 'Count']
+            fig = px.bar(
+                edu_counts,
+                x='Education',
+                y='Count',
+                title='Education Level',
+                color='Count',
+                color_continuous_scale='Oranges',
+                labels={'Education': 'Education Level', 'Count': 'Customer Count'}
+            )
+            fig.update_traces(
+                hovertemplate="<b>Education</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Education Level",
+                yaxis_title="Customer Count"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:
+            mar_counts = filtered_df['Marital_Status'].value_counts().reset_index()
+            mar_counts.columns = ['Marital Status', 'Count']
+            fig = px.bar(
+                mar_counts,
+                x='Marital Status',
+                y='Count',
+                title='Marital Status',
+                color='Count',
+                color_continuous_scale='Greens',
+                labels={'Marital Status': 'Marital Status', 'Count': 'Customer Count'}
+            )
+            fig.update_traces(
+                hovertemplate="<b>Marital Status</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Marital Status",
+                yaxis_title="Customer Count"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
     # Tab 2: Purchase Behavior
     with tab2:
         st.markdown("## 🛒 Purchase Behavior")
+
         col1, col2 = st.columns(2)
+        
         with col1:
             spending_cols = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
-            spending_means = filtered_df[spending_cols].mean()
-            colors = plt.cm.Blues(np.linspace(0.4, 1.0, len(spending_means)))
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.bar(spending_means.index, spending_means.values, color=colors, edgecolor=COLORS["border"])
-            ax.set_title('Spending by Category', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            plt.xticks(rotation=45, ha='right')
-            st.pyplot(fig)
+            spending_means = filtered_df[spending_cols].mean().reset_index()
+            spending_means.columns = ['Category', 'Avg Spending']
+            fig = px.bar(
+                spending_means,
+                x='Category',
+                y='Avg Spending',
+                title='Spending by Category',
+                color='Avg Spending',
+                color_continuous_scale='Blues',
+                labels={'Category': 'Product Category', 'Avg Spending': 'Average Spending ($)'}
+            )
+            fig.update_traces(
+                hovertemplate="<b>Category</b>: %{x}<br><b>Avg Spending</b>: $%{y:,.0f}<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Product Category",
+                yaxis_title="Average Spending ($)"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
         with col2:
             purchase_types = ['NumWebPurchases','NumCatalogPurchases','NumStorePurchases']
-            purchase_means = filtered_df[purchase_types].mean()
-            colors = plt.cm.Purples(np.linspace(0.4, 1.0, len(purchase_means)))
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.bar(purchase_types, purchase_means.values, color=colors, edgecolor=COLORS["border"])
-            ax.set_title('Purchase Channel Preference', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            plt.xticks(rotation=45, ha='right')
-            st.pyplot(fig)
-        
+            purchase_means = filtered_df[purchase_types].mean().reset_index()
+            purchase_means.columns = ['Channel', 'Avg Purchases']
+            fig = px.bar(
+                purchase_means,
+                x='Channel',
+                y='Avg Purchases',
+                title='Purchase Channel Preference',
+                color='Avg Purchases',
+                color_continuous_scale='Purples',
+                labels={'Channel': 'Purchase Channel', 'Avg Purchases': 'Average Purchases'}
+            )
+            fig.update_traces(
+                hovertemplate="<b>Channel</b>: %{x}<br><b>Avg Purchases</b>: %{y:.1f}<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Purchase Channel",
+                yaxis_title="Average Purchases"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
         col1, col2 = st.columns(2)
+        
         with col1:
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.scatter(filtered_df['Income'], filtered_df['TotalMnt'], alpha=0.6, color=COLORS["accent"])
-            ax.set_title('Income vs Total Spending', color=COLORS["text_primary"])
-            ax.set_xlabel('Income ($)', color=COLORS["text_primary"])
-            ax.set_ylabel('Total Spending ($)', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            st.pyplot(fig)
-        with col2:
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.hist(filtered_df['TotalPurchases'], bins=20, color=COLORS["accent"], edgecolor=COLORS["border"], alpha=0.8)
-            ax.set_title('Total Purchases Distribution', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            st.pyplot(fig)
-    
+            fig = px.scatter(
+                filtered_df,
+                x='Income',
+                y='TotalMnt',
+                color='Has_Children',
+                hover_data=['Age', 'Education', 'TotalPurchases'],
+                title='Income vs Total Spending',
+                labels={'Income': 'Income ($)', 'TotalMnt': 'Total Spending ($)'},
+                color_discrete_map={0: '#FF9800', 1: '#E65100'}
+            )
+            fig.update_traces(
+                hovertemplate=(
+                    "<b>Income</b>: $%{x:,.0f}<br>"
+                    "<b>Spending</b>: $%{y:,.0f}<br>"
+                    "<b>Age</b>: %{customdata[0]}<br>"
+                    "<b>Education</b>: %{customdata[1]}<br>"
+                    "<b>Purchases</b>: %{customdata[2]}<extra></extra>"
+                )
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Income ($)",
+                yaxis_title="Total Spending ($)"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:  # inside Tab 2, second column of second row
+            hist_data = filtered_df['TotalPurchases']
+            kde = gaussian_kde(hist_data)
+            x_vals = np.linspace(max(0, hist_data.min()), hist_data.max(), 200)
+            y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 20
+
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=hist_data,
+                nbinsx=20,
+                marker_color=COLORS["accent"],
+                opacity=0.7,
+                hovertemplate="<b>Total Purchases</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>",
+                name="Total Purchases"
+            ))
+            fig.add_trace(go.Scatter(
+                x=x_vals,
+                y=y_kde,
+                mode='lines',
+                line=dict(color=COLORS["accent_hover"], width=3),
+                name="Trend (KDE)"
+            ))
+            fig.update_layout(
+                title='Total Purchases Distribution',
+                xaxis_title='Total Purchases',
+                yaxis_title='Count',
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"]
+            )
+            st.plotly_chart(fig, use_container_width=True)    
+
     # Tab 3: Campaign Response
     with tab3:
         st.markdown("## 📣 Campaign Response")
+
         campaign_cols = ['AcceptedCmp1','AcceptedCmp2','AcceptedCmp3','AcceptedCmp4','AcceptedCmp5','Response']
-        acceptance_rates = filtered_df[campaign_cols].mean() * 100
-        
-        fig, ax = plt.subplots(figsize=(8,4), facecolor=COLORS["background"])
-        colors = plt.cm.Reds(np.linspace(0.4, 1.0, len(acceptance_rates)))
-        bars = ax.bar(acceptance_rates.index, acceptance_rates.values, color=colors, edgecolor=COLORS["border"])
-        ax.set_title('Campaign Acceptance Rates (%)', color=COLORS["text_primary"])
-        ax.set_facecolor(COLORS["background"])
-        ax.grid(True, color=COLORS["border"])
-        plt.xticks(rotation=45, ha='right')
-        for bar in bars:
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width() / 2., height + 1, f'{height:.1f}%', 
-                    ha='center', va='bottom', fontsize=9, color=COLORS["text_primary"])
-        st.pyplot(fig)
-        
+        acceptance_rates = (filtered_df[campaign_cols].mean() * 100).reset_index()
+        acceptance_rates.columns = ['Campaign', 'Acceptance Rate (%)']
+
+        fig = px.bar(
+            acceptance_rates,
+            x='Campaign',
+            y='Acceptance Rate (%)',
+            title='Campaign Acceptance Rates (%)',
+            color='Acceptance Rate (%)',
+            color_continuous_scale='Reds',
+            labels={'Campaign': 'Campaign', 'Acceptance Rate (%)': 'Acceptance Rate (%)'}
+        )
+        fig.update_traces(
+            hovertemplate="<b>Campaign</b>: %{x}<br><b>Acceptance Rate</b>: %{y:.1f}%<extra></extra>"
+        )
+        fig.update_layout(
+            plot_bgcolor=COLORS["background"],
+            paper_bgcolor=COLORS["background"],
+            font_color=COLORS["text_primary"],
+            xaxis_title="Campaign",
+            yaxis_title="Acceptance Rate (%)"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
         col1, col2 = st.columns(2)
+        
         with col1:
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            ax.scatter(filtered_df['TotalAcceptedCmp'], filtered_df['TotalMnt'], alpha=0.6, color=COLORS["accent"])
-            ax.set_title('Campaigns Accepted vs Spending', color=COLORS["text_primary"])
-            ax.set_xlabel('Campaigns Accepted', color=COLORS["text_primary"])
-            ax.set_ylabel('Total Spending ($)', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            st.pyplot(fig)
+            fig = px.scatter(
+                filtered_df,
+                x='TotalAcceptedCmp',
+                y='TotalMnt',
+                color='TotalAcceptedCmp',
+                hover_data=['Age', 'Income', 'Has_Children'],
+                title='Campaigns Accepted vs Spending',
+                labels={'TotalAcceptedCmp': 'Campaigns Accepted', 'TotalMnt': 'Total Spending ($)'},
+                color_continuous_scale='YlOrRd'
+            )
+            fig.update_traces(
+                hovertemplate=(
+                    "<b>Campaigns Accepted</b>: %{x}<br>"
+                    "<b>Spending</b>: $%{y:,.0f}<br>"
+                    "<b>Age</b>: %{customdata[0]}<br>"
+                    "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
+                    "<b>Has Children</b>: %{customdata[2]}<extra></extra>"
+                )
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Campaigns Accepted",
+                yaxis_title="Total Spending ($)"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
         with col2:
-            fig, ax = plt.subplots(figsize=(6,4), facecolor=COLORS["background"])
-            web_visits = filtered_df['NumWebVisitsMonth']
-            purchases = filtered_df['TotalPurchases']
-            scatter = ax.scatter(web_visits, purchases, c=web_visits, cmap='Oranges', alpha=0.7)
-            ax.set_title('Web Visits vs Total Purchases', color=COLORS["text_primary"])
-            ax.set_xlabel('Monthly Web Visits', color=COLORS["text_primary"])
-            ax.set_ylabel('Total Purchases', color=COLORS["text_primary"])
-            ax.set_facecolor(COLORS["background"])
-            ax.grid(True, color=COLORS["border"])
-            plt.colorbar(scatter, ax=ax, label='Web Visits')
-            st.pyplot(fig)
-    
+            fig = px.scatter(
+                filtered_df,
+                x='NumWebVisitsMonth',
+                y='TotalPurchases',
+                color='NumWebVisitsMonth',
+                hover_data=['Age', 'Income', 'TotalMnt'],
+                title='Web Visits vs Total Purchases',
+                labels={'NumWebVisitsMonth': 'Monthly Web Visits', 'TotalPurchases': 'Total Purchases'},
+                color_continuous_scale='Oranges'
+            )
+            fig.update_traces(
+                hovertemplate=(
+                    "<b>Web Visits</b>: %{x}<br>"
+                    "<b>Purchases</b>: %{y}<br>"
+                    "<b>Age</b>: %{customdata[0]}<br>"
+                    "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
+                    "<b>Spending</b>: $%{customdata[2]:,.0f}<extra></extra>"
+                )
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Monthly Web Visits",
+                yaxis_title="Total Purchases"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
     # Tab 4: Clustering & Marketing
     with tab4:
         scaler, pca, clusterer, cluster_profiles, supervised_model = load_models()
@@ -467,26 +712,59 @@ elif page == "Customer Dashboard":
                 with cols[cluster_id]:
                     st.markdown(f"### Cluster {cluster_id}")
                     st.info(CONFIG["cluster_descriptions"][cluster_id])
-                    fig, ax = plt.subplots(figsize=(4, 4), subplot_kw=dict(polar=True))
+                    
                     categories = list(cluster_profiles.columns)
                     N = len(categories)
-                    angles = [n / float(N) * 2 * pi for n in range(N)]
-                    angles += angles[:1]
+                    angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
                     values = cluster_profiles.loc[cluster_id].values.flatten().tolist()
                     values += values[:1]
-                    ax.plot(angles, values, linewidth=2, linestyle='solid', color=COLORS["accent"])
-                    ax.fill(angles, values, alpha=0.25, color=COLORS["accent"])
-                    ax.set_xticks(angles[:-1])
-                    ax.set_xticklabels(categories, size=8, color=COLORS["text_primary"])
-                    ax.set_ylim(0, 1)
-                    ax.set_facecolor(COLORS["background"])
-                    st.pyplot(fig)
+                    angles += angles[:1]
+                    
+                    fig = go.Figure(
+                        data=go.Scatterpolar(
+                            r=values,
+                            theta=categories + [categories[0]],
+                            fill='toself',
+                            line_color=COLORS["accent"],
+                            hoverinfo='text',
+                            text=[f"{cat}: {val:.2f}" for cat, val in zip(categories, cluster_profiles.loc[cluster_id])]
+                        )
+                    )
+                    fig.update_layout(
+                        polar=dict(
+                            radialaxis=dict(visible=True, range=[0, 1]),
+                            angularaxis=dict(direction="clockwise", period=N)
+                        ),
+                        showlegend=False,
+                        title=f"Cluster {cluster_id} Profile",
+                        plot_bgcolor=COLORS["background"],
+                        paper_bgcolor=COLORS["background"],
+                        font_color=COLORS["text_primary"]
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
             
             st.markdown("### 🌡️ Feature Heatmap")
-            fig, ax = plt.subplots(figsize=(10, 3), facecolor=COLORS["background"])
-            sns.heatmap(cluster_profiles, annot=True, cmap="YlGnBu", fmt=".2f", ax=ax, cbar_kws={'shrink': 0.8})
-            ax.set_facecolor(COLORS["background"])
-            st.pyplot(fig)
+            df_heatmap = cluster_profiles.reset_index()
+            df_heatmap.columns.name = None  # Remove name if any
+            df_melted = df_heatmap.melt(id_vars=df_heatmap.columns[0], var_name='Feature', value_name='Value')
+            fig = px.density_heatmap(
+                df_melted,
+                x='Feature',
+                y=df_heatmap.columns[0],  # e.g., 'Cluster'
+                z='Value',
+                title='Feature Heatmap',
+                color_continuous_scale='YlGnBu',
+                labels={'Feature': 'Feature', df_heatmap.columns[0]: 'Cluster', 'Value': 'Normalized Value'}
+            )
+            fig.update_traces(
+                hovertemplate="<b>Cluster</b>: %{y}<br><b>Feature</b>: %{x}<br><b>Value</b>: %{z:.2f}<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["background"],
+                paper_bgcolor=COLORS["background"],
+                font_color=COLORS["text_primary"]
+            )
+            st.plotly_chart(fig, use_container_width=True)
             
             st.markdown("## 💡 Marketing Strategies")
             for cid in [0, 1]:
@@ -494,6 +772,46 @@ elif page == "Customer Dashboard":
                 st.markdown(f"**Profile**: {CONFIG['cluster_descriptions'][cid]}")
                 st.markdown(f"**Actions**:\n{CONFIG['cluster_marketing'][cid]}")
                 st.markdown("---")
+                
+            # Model Performance
+            st.markdown("## 📈 Model Performance")
+            metrics = load_model_metrics()
+            if metrics:
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Silhouette Score (Clustering)", f"{metrics.get('silhouette_score', 'N/A'):.3f}")
+                    st.caption("Measures cluster separation (higher = better)")
+                if 'logistic_accuracy' in metrics:
+                    with col2:
+                        st.metric("Logistic Regression Accuracy", f"{metrics['logistic_accuracy']:.2%}")
+                        st.caption("Classification performance on test set")
+                    
+                    class_metrics = {
+                        "Precision": metrics.get("logistic_precision", 0),
+                        "Recall": metrics.get("logistic_recall", 0),
+                        "F1-Score": metrics.get("logistic_f1", 0)
+                    }
+                    st.dataframe(pd.DataFrame([class_metrics]).T.rename(columns={0: "Score"}))
+                    
+                    if "confusion_matrix" in metrics:
+                        cm = np.array(metrics["confusion_matrix"])
+                        fig = px.imshow(
+                            cm,
+                            text_auto=True,
+                            labels=dict(x="Predicted", y="Actual"),
+                            x=["Budget", "Premium"],
+                            y=["Budget", "Premium"],
+                            color_continuous_scale="Blues",
+                            title="Confusion Matrix"
+                        )
+                        fig.update_layout(
+                            plot_bgcolor=COLORS["background"],
+                            paper_bgcolor=COLORS["background"],
+                            font_color=COLORS["text_primary"]
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("Model metrics not found. Place `model_metrics.json` in the `models/` folder.")
         else:
             st.error("Clustering model not found or not 2 clusters.")
 
@@ -537,7 +855,6 @@ elif page == "Predict Customer Segment":
                 pred_label = int(supervised_model.predict(scaled)[0])
                 segment_name = "Budget" if pred_label == 0 else "Premium"
                 
-                # Show confidence if available
                 confidence_msg = ""
                 if hasattr(supervised_model, "predict_proba"):
                     proba = supervised_model.predict_proba(scaled)[0]
