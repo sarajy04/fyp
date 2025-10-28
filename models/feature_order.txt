@@ -1,8 +1,15 @@
+MntWines
+MntFruits
+MntMeatProducts
+MntFishProducts
+MntSweetProducts
+MntGoldProds
+NumWebPurchases
+NumCatalogPurchases
+NumStorePurchases
 Age
 Income
 Has_Children
-TotalMnt
-TotalPurchases
 NumWebVisitsMonth
 TotalAcceptedCmp
 Days_Customer
