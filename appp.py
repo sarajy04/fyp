@@ -99,6 +99,28 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
+# Add global styles
+st.markdown(f"""
+<style>
+    .stApp {{
+        background-color: {COLORS['background']} !important;
+    }}
+    h1, h2, h3, h4, h5, h6, p, div {{
+        color: {COLORS['text_primary']} !important;
+    }}
+
+    /* ✅ Unified EDA & Cluster Card Style */
+    .eda-card {{
+        background-color: {COLORS['card_bg']} !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+        border: 1px solid {COLORS['border']} !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+    }}
+</style>
+""", unsafe_allow_html=True)
+
 # =============================================================================
 # User Authentication
 # =============================================================================
@@ -572,226 +594,231 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True) 
 
-    # Tab 2: Purchase Behavior
+       # Tab 2: Purchase Behavior
     with tab2:
         st.markdown("## 🛒 Purchase Behavior")
 
         col1, col2 = st.columns(2)
-        
         with col1:
-            st.markdown(CARD_STYLE, unsafe_allow_html=True)
-            spending_cols = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
-            spending_means = filtered_df[spending_cols].mean().reset_index()
-            spending_means.columns = ['Category', 'Avg Spending']
-            fig = px.bar(
-                spending_means,
-                x='Category',
-                y='Avg Spending',
-                title='Spending by Category',
-                color='Avg Spending',
-                color_continuous_scale='Blues',
-                labels={'Category': 'Product Category', 'Avg Spending': 'Average Spending ($)'}
-            )
-            fig.update_traces(
-                hovertemplate="<b>Category</b>: %{x}<br><b>Avg Spending</b>: $%{y:,.0f}<extra></extra>"
-            )
-            fig.update_layout(
-                plot_bgcolor=COLORS["card_bg"],
-                paper_bgcolor=COLORS["card_bg"],
-                font_color=COLORS["text_primary"],
-                xaxis_title="Product Category",
-                yaxis_title="Average Spending ($)"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            st.markdown(CLOSE_CARD, unsafe_allow_html=True) 
+            with st.container():
+                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+                spending_cols = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
+                spending_means = filtered_df[spending_cols].mean().reset_index()
+                spending_means.columns = ['Category', 'Avg Spending']
+                fig = px.bar(
+                    spending_means,
+                    x='Category',
+                    y='Avg Spending',
+                    title='Spending by Category',
+                    color='Avg Spending',
+                    color_continuous_scale='Blues',
+                    labels={'Category': 'Product Category', 'Avg Spending': 'Average Spending ($)'}
+                )
+                fig.update_traces(
+                    hovertemplate="<b>Category</b>: %{x}<br><b>Avg Spending</b>: $%{y:,.0f}<extra></extra>"
+                )
+                fig.update_layout(
+                    plot_bgcolor=COLORS["card_bg"],
+                    paper_bgcolor=COLORS["card_bg"],
+                    font_color=COLORS["text_primary"],
+                    xaxis_title="Product Category",
+                    yaxis_title="Average Spending ($)"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True) 
 
         with col2:
-            st.markdown(CARD_STYLE, unsafe_allow_html=True) 
-            purchase_types = ['NumWebPurchases','NumCatalogPurchases','NumStorePurchases']
-            purchase_means = filtered_df[purchase_types].mean().reset_index()
-            purchase_means.columns = ['Channel', 'Avg Purchases']
-            fig = px.bar(
-                purchase_means,
-                x='Channel',
-                y='Avg Purchases',
-                title='Purchase Channel Preference',
-                color='Avg Purchases',
-                color_continuous_scale='Purples',
-                labels={'Channel': 'Purchase Channel', 'Avg Purchases': 'Average Purchases'}
-            )
-            fig.update_traces(
-                hovertemplate="<b>Channel</b>: %{x}<br><b>Avg Purchases</b>: %{y:.1f}<extra></extra>"
-            )
-            fig.update_layout(
-                plot_bgcolor=COLORS["card_bg"],
-                paper_bgcolor=COLORS["card_bg"],
-                font_color=COLORS["text_primary"],
-                xaxis_title="Purchase Channel",
-                yaxis_title="Average Purchases"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            st.markdown(CLOSE_CARD, unsafe_allow_html=True) 
+            with st.container():
+                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+                purchase_types = ['NumWebPurchases','NumCatalogPurchases','NumStorePurchases']
+                purchase_means = filtered_df[purchase_types].mean().reset_index()
+                purchase_means.columns = ['Channel', 'Avg Purchases']
+                fig = px.bar(
+                    purchase_means,
+                    x='Channel',
+                    y='Avg Purchases',
+                    title='Purchase Channel Preference',
+                    color='Avg Purchases',
+                    color_continuous_scale='Purples',
+                    labels={'Channel': 'Purchase Channel', 'Avg Purchases': 'Average Purchases'}
+                )
+                fig.update_traces(
+                    hovertemplate="<b>Channel</b>: %{x}<br><b>Avg Purchases</b>: %{y:.1f}<extra></extra>"
+                )
+                fig.update_layout(
+                    plot_bgcolor=COLORS["card_bg"],
+                    paper_bgcolor=COLORS["card_bg"],
+                    font_color=COLORS["text_primary"],
+                    xaxis_title="Purchase Channel",
+                    yaxis_title="Average Purchases"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True) 
 
         col1, col2 = st.columns(2)
-        
         with col1:
-            st.markdown(CARD_STYLE, unsafe_allow_html=True)
-            fig = px.scatter(
-                filtered_df,
-                x='Income',
-                y='TotalMnt',
-                color='Has_Children',
-                hover_data=['Age', 'Education', 'TotalPurchases'],
-                title='Income vs Total Spending',
-                labels={'Income': 'Income ($)', 'TotalMnt': 'Total Spending ($)'},
-                color_discrete_map={0: '#FF9800', 1: '#E65100'}
-            )
-            fig.update_traces(
-                hovertemplate=(
-                    "<b>Income</b>: $%{x:,.0f}<br>"
-                    "<b>Spending</b>: $%{y:,.0f}<br>"
-                    "<b>Age</b>: %{customdata[0]}<br>"
-                    "<b>Education</b>: %{customdata[1]}<br>"
-                    "<b>Purchases</b>: %{customdata[2]}<extra></extra>"
+            with st.container():
+                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+                fig = px.scatter(
+                    filtered_df,
+                    x='Income',
+                    y='TotalMnt',
+                    color='Has_Children',
+                    hover_data=['Age', 'Education', 'TotalPurchases'],
+                    title='Income vs Total Spending',
+                    labels={'Income': 'Income ($)', 'TotalMnt': 'Total Spending ($)'},
+                    color_discrete_map={0: '#FF9800', 1: '#E65100'}
                 )
-            )
-            fig.update_layout(
-                plot_bgcolor=COLORS["card_bg"],
-                paper_bgcolor=COLORS["card_bg"],
-                font_color=COLORS["text_primary"],
-                xaxis_title="Income ($)",
-                yaxis_title="Total Spending ($)"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            st.markdown(CLOSE_CARD, unsafe_allow_html=True) 
+                fig.update_traces(
+                    hovertemplate=(
+                        "<b>Income</b>: $%{x:,.0f}<br>"
+                        "<b>Spending</b>: $%{y:,.0f}<br>"
+                        "<b>Age</b>: %{customdata[0]}<br>"
+                        "<b>Education</b>: %{customdata[1]}<br>"
+                        "<b>Purchases</b>: %{customdata[2]}<extra></extra>"
+                    )
+                )
+                fig.update_layout(
+                    plot_bgcolor=COLORS["card_bg"],
+                    paper_bgcolor=COLORS["card_bg"],
+                    font_color=COLORS["text_primary"],
+                    xaxis_title="Income ($)",
+                    yaxis_title="Total Spending ($)"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True) 
 
         with col2:  # inside Tab 2, second column of second row
-            st.markdown(CARD_STYLE, unsafe_allow_html=True)
-            hist_data = filtered_df['TotalPurchases']
-            kde = gaussian_kde(hist_data)
-            x_vals = np.linspace(max(0, hist_data.min()), hist_data.max(), 200)
-            y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 20
+            with st.container():
+                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+                hist_data = filtered_df['TotalPurchases']
+                kde = gaussian_kde(hist_data)
+                x_vals = np.linspace(max(0, hist_data.min()), hist_data.max(), 200)
+                y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 20
 
-            fig = go.Figure()
-            fig.add_trace(go.Histogram(
-                x=hist_data,
-                nbinsx=20,
-                marker_color=COLORS["accent"],
-                opacity=0.7,
-                hovertemplate="<b>Total Purchases</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>",
-                name="Total Purchases"
-            ))
-            fig.add_trace(go.Scatter(
-                x=x_vals,
-                y=y_kde,
-                mode='lines',
-                line=dict(color=COLORS["accent_hover"], width=3),
-                name="Trend (KDE)"
-            ))
-            fig.update_layout(
-                title='Total Purchases Distribution',
-                xaxis_title='Total Purchases',
-                yaxis_title='Count',
-                plot_bgcolor=COLORS["card_bg"],
-                paper_bgcolor=COLORS["card_bg"],
-                font_color=COLORS["text_primary"]
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            st.markdown(CLOSE_CARD, unsafe_allow_html=True)     
+                fig = go.Figure()
+                fig.add_trace(go.Histogram(
+                    x=hist_data,
+                    nbinsx=20,
+                    marker_color=COLORS["accent"],
+                    opacity=0.7,
+                    hovertemplate="<b>Total Purchases</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>",
+                    name="Total Purchases"
+                ))
+                fig.add_trace(go.Scatter(
+                    x=x_vals,
+                    y=y_kde,
+                    mode='lines',
+                    line=dict(color=COLORS["accent_hover"], width=3),
+                    name="Trend (KDE)"
+                ))
+                fig.update_layout(
+                    title='Total Purchases Distribution',
+                    xaxis_title='Total Purchases',
+                    yaxis_title='Count',
+                    plot_bgcolor=COLORS["card_bg"],
+                    paper_bgcolor=COLORS["card_bg"],
+                    font_color=COLORS["text_primary"]
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)     
 
-    # Tab 3: Campaign Response
+        # Tab 3: Campaign Response
     with tab3:
         st.markdown("## 📣 Campaign Response")
-        st.markdown(CARD_STYLE, unsafe_allow_html=True) 
-        campaign_cols = ['AcceptedCmp1','AcceptedCmp2','AcceptedCmp3','AcceptedCmp4','AcceptedCmp5','Response']
-        acceptance_rates = (filtered_df[campaign_cols].mean() * 100).reset_index()
-        acceptance_rates.columns = ['Campaign', 'Acceptance Rate (%)']
 
-        fig = px.bar(
-            acceptance_rates,
-            x='Campaign',
-            y='Acceptance Rate (%)',
-            title='Campaign Acceptance Rates (%)',
-            color='Acceptance Rate (%)',
-            color_continuous_scale='Reds',
-            labels={'Campaign': 'Campaign', 'Acceptance Rate (%)': 'Acceptance Rate (%)'}
-        )
-        fig.update_traces(
-            hovertemplate="<b>Campaign</b>: %{x}<br><b>Acceptance Rate</b>: %{y:.1f}%<extra></extra>"
-        )
-        fig.update_layout(
-            plot_bgcolor=COLORS["card_bg"],
-            paper_bgcolor=COLORS["card_bg"],
-            font_color=COLORS["text_primary"],
-            xaxis_title="Campaign",
-            yaxis_title="Acceptance Rate (%)"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown(CLOSE_CARD, unsafe_allow_html=True) 
+        with st.container():
+            st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+            campaign_cols = ['AcceptedCmp1','AcceptedCmp2','AcceptedCmp3','AcceptedCmp4','AcceptedCmp5','Response']
+            acceptance_rates = (filtered_df[campaign_cols].mean() * 100).reset_index()
+            acceptance_rates.columns = ['Campaign', 'Acceptance Rate (%)']
+
+            fig = px.bar(
+                acceptance_rates,
+                x='Campaign',
+                y='Acceptance Rate (%)',
+                title='Campaign Acceptance Rates (%)',
+                color='Acceptance Rate (%)',
+                color_continuous_scale='Reds',
+                labels={'Campaign': 'Campaign', 'Acceptance Rate (%)': 'Acceptance Rate (%)'}
+            )
+            fig.update_traces(
+                hovertemplate="<b>Campaign</b>: %{x}<br><b>Acceptance Rate</b>: %{y:.1f}%<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Campaign",
+                yaxis_title="Acceptance Rate (%)"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True) 
 
         col1, col2 = st.columns(2)
-        
         with col1:
-            st.markdown(CARD_STYLE, unsafe_allow_html=True)
-            fig = px.scatter(
-                filtered_df,
-                x='TotalAcceptedCmp',
-                y='TotalMnt',
-                color='TotalAcceptedCmp',
-                hover_data=['Age', 'Income', 'Has_Children'],
-                title='Campaigns Accepted vs Spending',
-                labels={'TotalAcceptedCmp': 'Campaigns Accepted', 'TotalMnt': 'Total Spending ($)'},
-                color_continuous_scale='YlOrRd'
-            )
-            fig.update_traces(
-                hovertemplate=(
-                    "<b>Campaigns Accepted</b>: %{x}<br>"
-                    "<b>Spending</b>: $%{y:,.0f}<br>"
-                    "<b>Age</b>: %{customdata[0]}<br>"
-                    "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
-                    "<b>Has Children</b>: %{customdata[2]}<extra></extra>"
+            with st.container():
+                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+                fig = px.scatter(
+                    filtered_df,
+                    x='TotalAcceptedCmp',
+                    y='TotalMnt',
+                    color='TotalAcceptedCmp',
+                    hover_data=['Age', 'Income', 'Has_Children'],
+                    title='Campaigns Accepted vs Spending',
+                    labels={'TotalAcceptedCmp': 'Campaigns Accepted', 'TotalMnt': 'Total Spending ($)'},
+                    color_continuous_scale='YlOrRd'
                 )
-            )
-            fig.update_layout(
-                plot_bgcolor=COLORS["card_bg"],
-                paper_bgcolor=COLORS["card_bg"],
-                font_color=COLORS["text_primary"],
-                xaxis_title="Campaigns Accepted",
-                yaxis_title="Total Spending ($)"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            st.markdown(CLOSE_CARD, unsafe_allow_html=True) 
+                fig.update_traces(
+                    hovertemplate=(
+                        "<b>Campaigns Accepted</b>: %{x}<br>"
+                        "<b>Spending</b>: $%{y:,.0f}<br>"
+                        "<b>Age</b>: %{customdata[0]}<br>"
+                        "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
+                        "<b>Has Children</b>: %{customdata[2]}<extra></extra>"
+                    )
+                )
+                fig.update_layout(
+                    plot_bgcolor=COLORS["card_bg"],
+                    paper_bgcolor=COLORS["card_bg"],
+                    font_color=COLORS["text_primary"],
+                    xaxis_title="Campaigns Accepted",
+                    yaxis_title="Total Spending ($)"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True) 
 
         with col2:
-            st.markdown(CARD_STYLE, unsafe_allow_html=True)
-            fig = px.scatter(
-                filtered_df,
-                x='NumWebVisitsMonth',
-                y='TotalPurchases',
-                color='NumWebVisitsMonth',
-                hover_data=['Age', 'Income', 'TotalMnt'],
-                title='Web Visits vs Total Purchases',
-                labels={'NumWebVisitsMonth': 'Monthly Web Visits', 'TotalPurchases': 'Total Purchases'},
-                color_continuous_scale='Oranges'
-            )
-            fig.update_traces(
-                hovertemplate=(
-                    "<b>Web Visits</b>: %{x}<br>"
-                    "<b>Purchases</b>: %{y}<br>"
-                    "<b>Age</b>: %{customdata[0]}<br>"
-                    "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
-                    "<b>Spending</b>: $%{customdata[2]:,.0f}<extra></extra>"
+            with st.container():
+                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+                fig = px.scatter(
+                    filtered_df,
+                    x='NumWebVisitsMonth',
+                    y='TotalPurchases',
+                    color='NumWebVisitsMonth',
+                    hover_data=['Age', 'Income', 'TotalMnt'],
+                    title='Web Visits vs Total Purchases',
+                    labels={'NumWebVisitsMonth': 'Monthly Web Visits', 'TotalPurchases': 'Total Purchases'},
+                    color_continuous_scale='Oranges'
                 )
-            )
-            fig.update_layout(
-                plot_bgcolor=COLORS["card_bg"],
-                paper_bgcolor=COLORS["card_bg"],
-                font_color=COLORS["text_primary"],
-                xaxis_title="Monthly Web Visits",
-                yaxis_title="Total Purchases"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            st.markdown(CLOSE_CARD, unsafe_allow_html=True)
+                fig.update_traces(
+                    hovertemplate=(
+                        "<b>Web Visits</b>: %{x}<br>"
+                        "<b>Purchases</b>: %{y}<br>"
+                        "<b>Age</b>: %{customdata[0]}<br>"
+                        "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
+                        "<b>Spending</b>: $%{customdata[2]:,.0f}<extra></extra>"
+                    )
+                )
+                fig.update_layout(
+                    plot_bgcolor=COLORS["card_bg"],
+                    paper_bgcolor=COLORS["card_bg"],
+                    font_color=COLORS["text_primary"],
+                    xaxis_title="Monthly Web Visits",
+                    yaxis_title="Total Purchases"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
         # Tab 4: Clustering & Marketing
     with tab4:
@@ -851,59 +878,53 @@ elif page == "Customer Dashboard":
             cols = st.columns(2)
             for cluster_id in [0, 1]:
                 with cols[cluster_id]:
-                    # Open card container
-                    st.markdown(CARD_STYLE, unsafe_allow_html=True)
-                    
-                    insight = cluster_insights[cluster_id]
-                    st.markdown(f"### Cluster {cluster_id}: {insight['name']}")
-                    
-                    # Profile
-                    st.markdown("#### 👤 Behavioral Profile")
-                    for point in insight["profile"]:
-                        st.markdown(f"- {point}")
-                    
-                    # Why This Matters
-                    with st.expander("💡 Why This Matters"):
-                        for point in insight["why_it_matters"]:
+                    with st.container():
+                        st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+                        insight = cluster_insights[cluster_id]
+                        st.markdown(f"### Cluster {cluster_id}: {insight['name']}")
+                        # Profile
+                        st.markdown("#### 👤 Behavioral Profile")
+                        for point in insight["profile"]:
                             st.markdown(f"- {point}")
-                    
-                    # Radar Chart
-                    categories = list(cluster_profiles.columns)
-                    N = len(categories)
-                    angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
-                    values = cluster_profiles.loc[cluster_id].values.flatten().tolist()
-                    values += values[:1]
-                    angles += angles[:1]
-                    
-                    fig = go.Figure(
-                        data=go.Scatterpolar(
-                            r=values,
-                            theta=categories + [categories[0]],
-                            fill='toself',
-                            line_color=COLORS["accent"],
-                            hoverinfo='text',
-                            text=[f"{cat}: {val:.2f}" for cat, val in zip(categories, cluster_profiles.loc[cluster_id])]
+                        # Why This Matters
+                        with st.expander("💡 Why This Matters"):
+                            for point in insight["why_it_matters"]:
+                                st.markdown(f"- {point}")
+                        # Radar Chart
+                        categories = list(cluster_profiles.columns)
+                        N = len(categories)
+                        angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
+                        values = cluster_profiles.loc[cluster_id].values.flatten().tolist()
+                        values += values[:1]
+                        angles += angles[:1]
+                        fig = go.Figure(
+                            data=go.Scatterpolar(
+                                r=values,
+                                theta=categories + [categories[0]],
+                                fill='toself',
+                                line_color=COLORS["accent"],
+                                hoverinfo='text',
+                                text=[f"{cat}: {val:.2f}" for cat, val in zip(categories, cluster_profiles.loc[cluster_id])]
+                            )
                         )
-                    )
-                    fig.update_layout(
-                        polar=dict(
-                            radialaxis=dict(visible=True, range=[0, 1]),
-                            angularaxis=dict(direction="clockwise")
-                        ),
-                        showlegend=False,
-                        title=f"Behavioral Profile",
-                        plot_bgcolor=COLORS["card_bg"],  # match card background
-                        paper_bgcolor=COLORS["card_bg"],
-                        font_color=COLORS["text_primary"]
-                    )
-                    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-                    
-                    # Marketing Strategy
-                    with st.expander("💼 Recommended Marketing Strategy"):
-                        st.markdown("#### Actionable Tactics:")
-                        for tactic in insight["marketing"]:
-                            st.markdown(f"- {tactic}")
-                    
+                        fig.update_layout(
+                            polar=dict(
+                                radialaxis=dict(visible=True, range=[0, 1]),
+                                angularaxis=dict(direction="clockwise")
+                            ),
+                            showlegend=False,
+                            title=f"Behavioral Profile",
+                            plot_bgcolor=COLORS["card_bg"],
+                            paper_bgcolor=COLORS["card_bg"],
+                            font_color=COLORS["text_primary"]
+                        )
+                        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+                        # Marketing Strategy
+                        with st.expander("💼 Recommended Marketing Strategy"):
+                            st.markdown("#### Actionable Tactics:")
+                            for tactic in insight["marketing"]:
+                                st.markdown(f"- {tactic}")
+                        st.markdown('</div>', unsafe_allow_html=True)
                     # Close card
                     st.markdown(CLOSE_CARD, unsafe_allow_html=True)
             # === Heatmap & Model Performance (unchanged logic, just below personas) ===
@@ -924,10 +945,11 @@ elif page == "Customer Dashboard":
                 hovertemplate="<b>Cluster</b>: %{y}<br><b>Feature</b>: %{x}<br><b>Value</b>: %{z:.2f}<extra></extra>"
             )
             fig.update_layout(
-                plot_bgcolor=COLORS["background"],
-                paper_bgcolor=COLORS["background"],
-                font_color=COLORS["text_primary"]
+            plot_bgcolor=COLORS["card_bg"],
+            paper_bgcolor=COLORS["card_bg"],
+            font_color=COLORS["text_primary"]
             )
+            
             st.plotly_chart(fig, use_container_width=True)
             
             st.markdown("## 📈 Model Performance")
