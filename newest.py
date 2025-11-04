@@ -1,10 +1,8 @@
 # newest.py
-# Final integrated Streamlit dashboard — FULLY FIXED PER YOUR SPECS
-# - No white gaps above tabs
-# - EDA in soft cards (#fffaf5, #e6dccb border, shadow, 12px radius)
-# - Cluster columns: pure inline HTML cards (no Streamlit container artifacts)
-# - Expanders styled consistently
-# - Heatmap preserved
+# Final integrated Streamlit dashboard — NO MORE WHITE BARS ABOVE CHARTS
+# - EDA sections wrapped in soft cards directly
+# - Cluster columns fixed
+# - Layout unchanged
 # - Fully responsive
 
 import streamlit as st
@@ -47,15 +45,15 @@ CONFIG = {
         )
     },
     "colors": {
-        "background": "#FFF3E0",           # page cream background
-        "text_primary": "#333333",         # dark body text
-        "accent": "#FF9800",               # orange
-        "accent_hover": "#E65100",         # darker orange
-        "card_bg_eda": "#fffaf5",          # soft card for EDA sections
-        "border_eda": "#e6dccb",           # beige border for EDA & cluster cards
-        "header_beige": "#FFFFFF",         # banner text color (white)
-        "card_bg_soft": "#faf9f6",         # outer wrapper for takeaways
-        "card_bg_strong": "#FFFFFF",       # white for expanders, cluster inner cards
+        "background": "#FFF3E0",
+        "text_primary": "#333333",
+        "accent": "#FF9800",
+        "accent_hover": "#E65100",
+        "card_bg_eda": "#fffaf5",
+        "border_eda": "#e6dccb",
+        "header_beige": "#FFFFFF",
+        "card_bg_soft": "#faf9f6",
+        "card_bg_strong": "#FFFFFF",
     }
 }
 
@@ -72,7 +70,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ✅ FIX #1: Eliminate white space above content
+# Eliminate top white space
 st.markdown("<style>div.block-container{padding-top:1rem !important;}</style>", unsafe_allow_html=True)
 
 # -------------------------
@@ -90,7 +88,7 @@ st.markdown(f"""
     color: {COLORS['text_primary']} !important;
 }}
 
-/* Headers black by default */
+/* Headers black */
 .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6 {{
     color: #000000 !important;
 }}
@@ -100,7 +98,7 @@ st.markdown(f"""
     color: {COLORS['header_beige']} !important;
 }}
 
-/* ✅ EDA SOFT CARD */
+/* EDA soft card */
 .soft-card {{
     background-color: {COLORS['card_bg_eda']} !important;
     border: 1px solid {COLORS['border_eda']} !important;
@@ -110,7 +108,7 @@ st.markdown(f"""
     box-shadow: 0 3px 8px rgba(0,0,0,0.05) !important;
 }}
 
-/* Outer soft wrapper (takeaways, heatmap, strategies) */
+/* Outer soft wrapper */
 .card-soft {{
     background-color: {COLORS['card_bg_soft']} !important;
     border: 1px solid {COLORS['border_eda']} !important;
@@ -120,7 +118,7 @@ st.markdown(f"""
     box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
 }}
 
-/* ✅ Expander styling */
+/* Expander styling */
 .stExpander summary {{
     font-weight: 800 !important;
     color: #000000 !important;
@@ -135,7 +133,6 @@ st.markdown(f"""
     border: 1px solid #eee;
 }}
 
-/* Internal expander headings */
 .expander-heading {{
     color: #000 !important;
     font-weight: 800;
@@ -153,13 +150,13 @@ st.markdown(f"""
     color: {COLORS['text_primary']};
 }}
 
-/* Plot containers */
+/* Plots */
 .stPlotlyChart {{
     margin-top: 0 !important;
     padding-top: 0 !important;
 }}
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {{
     .soft-card, .card-soft {{
         padding: 12px !important;
@@ -176,7 +173,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # -------------------------
-# Helper wrappers
+# Helper wrappers (now unused in EDA)
 # -------------------------
 def start_soft_card():
     st.markdown('<div class="soft-card">', unsafe_allow_html=True)
@@ -554,7 +551,7 @@ elif page == "Customer Dashboard":
 
         col_a, col_b = st.columns(2)
         with col_a:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             hist_data = filtered_df['Age'] if 'Age' in filtered_df.columns else pd.Series([])
             if not hist_data.empty:
                 kde = gaussian_kde(hist_data)
@@ -587,10 +584,10 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Age data not available.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         with col_b:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             hist_data = filtered_df['Income'] if 'Income' in filtered_df.columns else pd.Series([])
             if not hist_data.empty:
                 kde = gaussian_kde(hist_data)
@@ -623,11 +620,11 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Income data not available.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         col_c, col_d = st.columns(2)
         with col_c:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             if 'Education' in filtered_df.columns:
                 edu_counts = filtered_df['Education'].value_counts().reset_index()
                 edu_counts.columns = ['Education', 'Count']
@@ -653,10 +650,10 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Education data not available.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         with col_d:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             if 'Marital_Status' in filtered_df.columns:
                 mar_counts = filtered_df['Marital_Status'].value_counts().reset_index()
                 mar_counts.columns = ['Marital Status', 'Count']
@@ -682,7 +679,7 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Marital status data not available.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         start_card_soft()
         with st.expander("📌 Key Takeaways (Demographics)", expanded=False):
@@ -701,7 +698,7 @@ elif page == "Customer Dashboard":
 
         col1, col2 = st.columns(2)
         with col1:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             spending_cols = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
             present_spending = [c for c in spending_cols if c in filtered_df.columns]
             if present_spending:
@@ -729,10 +726,10 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Spending category columns not available.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         with col2:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             purchase_types = ['NumWebPurchases','NumCatalogPurchases','NumStorePurchases']
             present_purchase_types = [c for c in purchase_types if c in filtered_df.columns]
             if present_purchase_types:
@@ -760,11 +757,11 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Purchase channel columns not available.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         col3, col4 = st.columns(2)
         with col3:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             if 'Income' in filtered_df.columns and 'TotalMnt' in filtered_df.columns:
                 fig = px.scatter(
                     filtered_df,
@@ -785,10 +782,10 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Income or Total Spending not available for scatter plot.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         with col4:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             if 'TotalPurchases' in filtered_df.columns:
                 hist_data = filtered_df['TotalPurchases']
                 kde = gaussian_kde(hist_data)
@@ -821,7 +818,7 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("TotalPurchases column not available.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         start_card_soft()
         with st.expander("📌 Key Takeaways (Purchase Behavior)", expanded=False):
@@ -838,7 +835,7 @@ elif page == "Customer Dashboard":
     with tab3:
         st.markdown("## 📣 Campaign Response")
 
-        start_soft_card()
+        st.markdown('<div class="soft-card">', unsafe_allow_html=True)
         campaign_cols = ['AcceptedCmp1','AcceptedCmp2','AcceptedCmp3','AcceptedCmp4','AcceptedCmp5','Response']
         present_campaign_cols = [c for c in campaign_cols if c in filtered_df.columns]
         if present_campaign_cols:
@@ -866,11 +863,11 @@ elif page == "Customer Dashboard":
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("Campaign columns not available.")
-        end_soft_card()
+        st.markdown('</div>', unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
         with col1:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             if 'TotalAcceptedCmp' in filtered_df.columns and 'TotalMnt' in filtered_df.columns:
                 fig = px.scatter(
                     filtered_df,
@@ -892,10 +889,10 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Required columns not available for this scatter.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         with col2:
-            start_soft_card()
+            st.markdown('<div class="soft-card">', unsafe_allow_html=True)
             if 'NumWebVisitsMonth' in filtered_df.columns and 'TotalPurchases' in filtered_df.columns:
                 fig = px.scatter(
                     filtered_df,
@@ -917,7 +914,7 @@ elif page == "Customer Dashboard":
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Required columns not available for this scatter.")
-            end_soft_card()
+            st.markdown('</div>', unsafe_allow_html=True)
 
         start_card_soft()
         with st.expander("📌 Key Takeaways (Campaigns)", expanded=False):
@@ -929,7 +926,7 @@ elif page == "Customer Dashboard":
         end_card_soft()
 
     # ---------------------------
-    # Tab 4: Clustering & Marketing — ✅ FIXED CLUSTER CARDS
+    # Tab 4: Clustering & Marketing — ✅ FIXED WITH INLINE HTML
     # ---------------------------
     with tab4:
         st.markdown("## 🧩 Customer Personas (2 Strategic Clusters)")
@@ -949,9 +946,9 @@ elif page == "Customer Dashboard":
                 with cols[i]:
                     start_card_soft()
                     st.markdown(f"### Cluster {cluster_id}: {CONFIG['cluster_descriptions'].get(cluster_id, f'Cluster {cluster_id}')}")
-
-                    # ✅ FIX #2: INLINE HTML CARD — NO GHOST CONTAINERS
-                    st.markdown(f"""
+                    
+                    # ✅ Wrap in inline HTML for guaranteed styling
+                    st.markdown("""
                     <div style='
                         background-color: #ffffff;
                         border: 1px solid #e9e3d8;
