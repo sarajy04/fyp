@@ -17,52 +17,51 @@ CONFIG = {
         'NumWebVisitsMonth', 'TotalAcceptedCmp', 'Days_Customer'
     ],
     "cluster_descriptions": {
-        0: "Responsive High Spenders: Higher income, actively engages with promotions, younger, spends more per transaction",
-        1: "Budget-Conscious Parent: Family-oriented, frequent low-spend shopper, loyal, older, browses often but ignores flashy campaigns"
+        0: "Budget-Conscious Parent: Family-oriented, frequent low-spend shopper, loyal, older, browses often but ignores flashy campaigns",
+        1: "Responsive High Spenders: Higher income, actively engages with promotions, younger, spends more per transaction"
     },
     "cluster_marketing": {
         0: (
-            "• Personalized dynamic content: “For you”, “Recommended based on your style”\n"
-            "• Offer flash sales, early access, VIP tiers — they respond to exclusivity\n"
-            "• Use retargeting + social proof: reviews, bestsellers, influencer tags\n"
-            "• Upsell/cross-sell at checkout — they’re willing to spend more"
-        ),
-        1: (
             "• Avoid blasting campaigns — use contextual nudges: “Based on your recent views...”, “Top picks for families like yours”\n"
             "• Improve product filtering & categorization — help them find what they need fast\n"
             "• Integrate loyalty program: show points earned on every visit/purchase\n"
             "• Trigger helpful emails: abandoned cart, restock alerts, “you viewed this last week”\n"
             "• Avoid flashy banners or heavy discounts — focus on utility, trust, and convenience"
+        ),
+        1: (
+            "• Personalized dynamic content: “For you”, “Recommended based on your style”\n"
+            "• Offer flash sales, early access, VIP tiers — they respond to exclusivity\n"
+            "• Use retargeting + social proof: reviews, bestsellers, influencer tags\n"
+            "• Upsell/cross-sell at checkout — they’re willing to spend more"
         )
     },
     "segment_descriptions": {
-        0: "Premium Segment: High spenders, responsive to offers (Cluster 0)",
-        1: "Budget Segment: Value-focused family shoppers (Cluster 1)"
+        0: "Budget Segment: Value-focused family shoppers (Cluster 1)",
+        1: "Premium Segment: High spenders, responsive to offers (Cluster 0)"
     },
     "segment_marketing": {
         0: (
-            "• Personalized dynamic content\n"
-            "• Flash sales & VIP access\n"
-            "• Retargeting with social proof\n"
-            "• Upsell at checkout"
-        ),
-        1: (
             "• Contextual, non-salesy nudges\n"
             "• Better site navigation & filters\n"
             "• Loyalty point visibility\n"
             "• Utility-driven email triggers\n"
             "• Minimize promotional noise"
+        ),
+        1: (
+            "• Personalized dynamic content\n"
+            "• Flash sales & VIP access\n"
+            "• Retargeting with social proof\n"
+            "• Upsell at checkout"
         )
     },
     "colors": {
-    "background": "#FFF3E0",      # Cream page background
-    "text_primary": "#333333",    # Dark text
-    "accent": "#FF9800",          # Orange for borders, highlights
-    "accent_hover": "#E65100",    # Darker orange for hover
-    "card_bg": "#FFFFFF",         # 🟢 White for cards (contrast against cream)
-    "border": "#E0E0E0"           # Light gray dividers
-}
-}
+    "background": "#FFF3E0",      
+    "text_primary": "#333333",    
+    "accent": "#FF9800",          
+    "accent_hover": "#E65100",    
+    "card_bg": "#FFFFFF",       
+    "border": "#E0E0E0"           
+}}
 
 FEATURES = CONFIG["features"]
 COLORS = CONFIG["colors"]
@@ -90,18 +89,7 @@ st.set_page_config(
 
 st.markdown(f"""
 <style>
-    .stApp {{
-        background-color: {COLORS['background']} !important;
-    }}
-    h1, h2, h3, h4, h5, h6, p, div {{
-        color: {COLORS['text_primary']} !important;
-    }}
-</style>
-""", unsafe_allow_html=True)
-
-# Add global styles
-st.markdown(f"""
-<style>
+    /* Global background and text colors */
     .stApp {{
         background-color: {COLORS['background']} !important;
     }}
@@ -109,21 +97,111 @@ st.markdown(f"""
         color: {COLORS['text_primary']} !important;
     }}
 
-    /* ✅ Unified EDA & Cluster Card Style */
+    /* REMOVE EXTRA TOP SPACING */
+    .st-emotion-cache-1v0mbdj, 
+    .st-emotion-cache-1wmy9hl, 
+    .stMarkdown, 
+    .element-container {{
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }}
+
+    /* ✅ Main EDA Card Styling */
     .eda-card {{
-        background-color: {COLORS['card_bg']} !important;
+        background-color: #fffaf0 !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        margin: 10px 0 20px 0 !important;
+        border: 1px solid #e5decf !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }}
+
+    /* ✅ Responsive column wrapping */
+    [data-testid="column"] {{
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }}
+
+    /* ✅ EXPANDER — FULL LIGHT BEIGE + GOLD ACCENT */
+    .stExpander {{
+        background-color: #fff7e6 !important;
+        border-radius: 10px !important;
+        border: 1px solid #f0e6d6 !important;
+        margin-bottom: 1rem !important;
+        overflow: hidden !important;
+        position: relative;
+    }}
+
+    /* Left accent bar */
+    .stExpander::before {{
+        content: "";
+        position: absolute;
+        inset: 0 0 0 0;
+        width: 6px;
+        height: 100%;
+        background-color: #E8C16D;
+        border-radius: 10px 0 0 10px;
+    }}
+
+    /* Expander header bar */
+    .stExpander > details > summary {{
+        background-color: #fff7e6 !important;
+        font-weight: 700 !important;
+        color: #5a4635 !important;
+        padding: 14px 16px !important;
+        border-radius: 10px !important;
+        position: relative;
+        z-index: 2;
+        list-style: none !important;
+    }}
+
+    /* Remove default arrow spacing */
+    .stExpander summary::-webkit-details-marker {{
+        display: none !important;
+    }}
+
+    /* ✅ Expander content — handles all Streamlit versions */
+    .stExpander > details > summary + div,
+    .st-expanderContent,
+    .st-expanderContent > div {{
+        background-color: #fffaf0 !important;
+        padding: 16px 18px !important;
+        border-radius: 0 0 10px 10px !important;
+        margin-top: 0 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
+        position: relative;
+        z-index: 1;
+    }}
+
+    /* ✅ Soft wrapper */
+    .card-soft {{
+        background-color: #faf9f6 !important;
         border-radius: 12px !important;
         padding: 20px !important;
         margin-bottom: 20px !important;
-        border: 1px solid {COLORS['border']} !important;
+        border: 1px solid #e0e0e0 !important;
         box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+    }}
+
+    /* ✅ Cluster header fix */
+    h3.cluster-header {{
+        line-height: 1.4;
+        margin-bottom: 0.6rem;
+        font-weight: 700;
+    }}
+    h3.cluster-header span {{
+        display: block;
     }}
 </style>
 """, unsafe_allow_html=True)
 
-# =============================================================================
+
 # User Authentication
-# =============================================================================
 USERS = {
     "admin": "segment2024",
     "analyst1": "analyze2024",
@@ -134,9 +212,8 @@ if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.username = ""
 
-# =============================================================================
+
 # Load Raw Data
-# =============================================================================
 @st.cache_data
 def load_raw_data():
     for path in ['marketing_campaign.csv', 'data/marketing_campaign.csv']:
@@ -148,9 +225,7 @@ def load_raw_data():
                 st.warning(f"Error loading {path}: {e}")
     return None
 
-# =============================================================================
 # Load Models
-# =============================================================================
 @st.cache_resource
 def load_models():
     def safe_load(path):
@@ -182,12 +257,15 @@ def load_model_metrics():
     except:
         return None
 
-# =============================================================================
 # Login Page
-# =============================================================================
 if not st.session_state.logged_in:
-    st.title("🔐 Targeted Marketing System for Grocery Retail")
-    st.markdown("Enter credentials to access confidential groceryy retail dashboard")
+    st.markdown("""
+    <h1 style='font-size:1.8rem; font-weight:600;'>
+    🔐 CoreCart <span style='font-size:1rem; color:#6b6b6b;'>| Your core customers. Your competitive edge.</span>
+    </h1>
+    """, unsafe_allow_html=True)
+
+    st.markdown("Enter credentials to access confidential grocery retail dashboard")
     with st.form("login_form"):
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
@@ -201,9 +279,66 @@ if not st.session_state.logged_in:
                 st.error("❌ Invalid username or password")
     st.stop()
 
-# =============================================================================
+# GLOBAL HEADER BANNER
+if st.session_state.logged_in:
+    header_image_path = "header.jpeg"
+
+    try:
+        with open(header_image_path, "rb") as f:
+            img_data = f.read()
+        img_base64 = base64.b64encode(img_data).decode()
+        bg_image = f"data:image/jpeg;base64,{img_base64}"
+        header_bg = f"url('{bg_image}')"
+    except:
+        header_bg = "#d88c4f"
+
+    st.markdown(f"""
+    <style>
+    .header-banner {{
+        background-image: {header_bg};
+        background-size: cover;
+        background-position: center;
+        padding: 40px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 25px;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }}
+
+    .header-banner::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25);
+        border-radius: 12px;
+        z-index: 0;
+    }}
+
+    .header-banner h1 {{
+        font-size: 3rem !important;
+        font-weight: 800 !important;
+        color: #FFF8E1 !important;
+        position: relative;
+        z-index: 2;
+    }}
+
+    .header-banner p {{
+        font-size: 1.35rem !important;
+        font-weight: 500 !important;
+        color: #FFF8E1 !important;
+        position: relative;
+        z-index: 2;
+    }}
+    </style>
+
+    <div class="header-banner">
+        <h1>CoreCart</h1>
+        <p>- Turn Exploration into Actions -</p>
+    </div>
+    """, unsafe_allow_html=True)
+
 # Logout
-# =============================================================================
 col1, col2 = st.columns([6, 1])
 with col2:
     if st.button("🚪 Logout"):
@@ -211,9 +346,7 @@ with col2:
         st.session_state.username = ""
         st.rerun()
 
-# =============================================================================
 # Preprocessing Function
-# =============================================================================
 def preprocess_for_eda(df_raw):
     df = df_raw.copy()
     df = df.dropna(subset=['Income'])
@@ -237,65 +370,110 @@ def preprocess_for_eda(df_raw):
     df["Days_Customer"] = (pd.to_datetime("2024-01-01") - df["Dt_Customer"]).dt.days
     return df
 
-# =============================================================================
+def plot_monthly_spending_line_chart(filtered_df, selected_category="All"):
+    """
+    Plot simulated monthly spending by grocery category.
+    """
+    import pandas as pd
+    import numpy as np
+    import plotly.express as px
+
+    # Map display names to column names
+    category_map = {
+        "Wines": "MntWines",
+        "Fruits": "MntFruits",
+        "Meat": "MntMeatProducts",
+        "Fish": "MntFishProducts",
+        "Sweets": "MntSweetProducts",
+        "Gold": "MntGoldProds"
+    }
+
+    # Filter columns based on selection
+    if selected_category == "All":
+        cols_to_plot = list(category_map.values())
+        display_names = list(category_map.keys())
+    else:
+        col_name = category_map.get(selected_category)
+        if col_name and col_name in filtered_df.columns:
+            cols_to_plot = [col_name]
+            display_names = [selected_category]
+        else:
+            st.info("Selected category data not available.")
+            return
+
+    # Check if columns exist
+    available_cols = [col for col in cols_to_plot if col in filtered_df.columns]
+    if not available_cols:
+        st.info("Spending category data not available.")
+        return
+
+    # Aggregate total spending per category
+    totals = {}
+    for col, name in zip(available_cols, display_names):
+        totals[name] = filtered_df[col].sum()
+
+    # Simulate monthly data
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    data = []
+    for category, total in totals.items():
+        if total == 0:
+            continue
+        monthly_avg = total / 12
+        np.random.seed(42)  # For consistent noise
+        noise = np.random.normal(0, monthly_avg * 0.1, len(months))
+        monthly_vals = np.clip(monthly_avg + noise, 0, None)
+        for month, val in zip(months, monthly_vals):
+            data.append({"Month": month, "Category": category, "Spending": val})
+
+    if not data:
+        st.info("No spending data to display.")
+        return
+
+    df_plot = pd.DataFrame(data)
+
+    # Create line chart
+    fig = px.line(
+        df_plot,
+        x='Month',
+        y='Spending',
+        color='Category',
+        title="Monthly Spending by Grocery Category",
+        markers=True
+    )
+    fig.update_layout(
+        plot_bgcolor=COLORS["card_bg"],
+        paper_bgcolor=COLORS["card_bg"],
+        font_color=COLORS["text_primary"],
+        xaxis_title="Month",
+        yaxis_title="Spending ($)",
+        legend_title="Category"
+    )
+    fig.update_traces(
+        hovertemplate="<b>%{fullData.name}</b><br>Month: %{x}<br>Spending: $%{y:,.0f}<extra></extra>"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
 # Navigation
-# =============================================================================
 st.sidebar.header("Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Customer Dashboard", "Predict Customer Segment"])
 
 # HOME PAGE
 if page == "Home":
-    # Load and encode background image
-    header_image_path = "header.jpeg"  # or .png
-    try:
-        with open(header_image_path, "rb") as f:
-            img_data = f.read()
-        img_base64 = base64.b64encode(img_data).decode()
-        bg_image = f"data:image/jpeg;base64,{img_base64}"
-        is_image = True
-    except FileNotFoundError:
-        st.warning(f"Header image '{header_image_path}' not found. Using solid color.")
-        is_image = False
+    st.markdown("""
+    ## 🎯 Our Aim
+    To provide a **data-driven customer segmentation and prediction** platform that helps businesses
+     understand their customers more effectively. By analyzing key demographic, behavioral, and campaign response data
+     this dashboard **identifies meaningful customer clusters** and predicts clusters of new customers with **confidence**. 
+     Through clear visualizations and actionable insights,
+     we empower marketers and business teams to make informed decisions, personalize marketing strategies, and 
+     improve overall customer engagement and loyalty.
+                
+    - Ultimately,  transform raw data into valuable intelligence for smarter, more targeted business growth.
+    """)
 
-    # Define background style (image or fallback color)
-    bg_style = f"url('{bg_image}')" if is_image else COLORS['accent']
+    st.markdown("---") 
 
-    st.markdown(f"""
-    <style>
-    .header-banner {{
-        background-image: {bg_style};
-        background-size: cover;
-        background-position: center;
-        padding: 30px;
-        border-radius: 10px;
-        text-align: center;
-        margin-bottom: 30px;
-        color: #FFF8E1; /* ✅ Light beige / off-white text */
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }}  
-
-    .header-banner h1 {{
-        font-size: 2.5rem;
-        margin: 0;
-        font-weight: 600;
-        color: #FFF8E1; /* ✅ Light beige */
-        #text-shadow: 1px 1px 3px rgba(0,0,0,0.15); /* Subtle shadow for readability */
-    }}
-
-    .header-banner p {{
-        font-size: 1.2rem;
-        margin-top: 10px;
-        color: #FFF8E1; /* ✅ Same light beige */
-        opacity: 0.95;
-    }}
-    </style>
-
-    <div class="header-banner">
-        <h1>Discover What Drives Your Shoppers</h1>
-        <p>Unlock actionable insights with AI-powered customer segmentation</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
     st.markdown("""
     ## 🎯 Introduction
     This system segments customers into **two distinct groups** using machine learning:
@@ -312,35 +490,6 @@ if page == "Home":
         df_home = preprocess_for_eda(df_raw)
         st.write(f"Records after cleaning: **{len(df_home)}**")
         st.dataframe(df_home[FEATURES].head(3))
-        
-        # KPI Cards with colored background (same as dashboard)
-        avg_spent = df_home['TotalMnt'].mean()
-        avg_age = df_home['Age'].mean()
-        avg_income = df_home['Income'].mean()
-        
-        col1, col2, col3 = st.columns(3)
-        kpi_style = "background-color: #FFFFFF; padding: 15px; border-radius: 8px; border-left: 5px solid #FF9800; color: #333333; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"
-        with col1:
-            st.markdown(f"""
-            <div style="{kpi_style}">
-                <h4>💰 Avg. Spending</h4>
-                <p style="font-size: 20px; font-weight: bold;">${avg_spent:,.0f}</p>
-            </div>
-            """, unsafe_allow_html=True)
-        with col2:
-            st.markdown(f"""
-            <div style="{kpi_style}">
-                <h4>👤 Avg. Age</h4>
-                <p style="font-size: 20px; font-weight: bold;">{avg_age:.1f}</p>
-            </div>
-            """, unsafe_allow_html=True)
-        with col3:
-            st.markdown(f"""
-            <div style="{kpi_style}">
-                <h4>💳 Avg. Income</h4>
-                <p style="font-size: 20px; font-weight: bold;">${avg_income:,.0f}</p>
-            </div>
-            """, unsafe_allow_html=True)
     else:
         st.error("Dataset not found. Place `marketing_campaign.csv` in the project root.")
 
@@ -351,10 +500,13 @@ if page == "Home":
     - Aligns with natural customer split (spending median)
     - Enables clear, actionable marketing strategies
     """)
-
+    
+    df_full = preprocess_for_eda(df_raw)
+    
 # CUSTOMER DASHBOARD
 elif page == "Customer Dashboard":
     st.title("📈 Customer Dashboard")
+    st.markdown("Ready to **understand** your customers better?")
     
     df_raw = load_raw_data()
     if df_raw is None:
@@ -362,28 +514,25 @@ elif page == "Customer Dashboard":
         st.stop()
     
     df_full = preprocess_for_eda(df_raw)
-    
-    # Filters
+
+    # DEFINE SIDEBAR FILTERS FIRST =====
     st.sidebar.header("🔍 Filters")
     
+    # Age Group
     age_bins = [18, 30, 45, 60, 100]
     age_labels = ["18-29", "30-44", "45-59", "60+"]
-    df_full['AgeGroup'] = pd.cut(df_full['Age'], bins=age_bins, labels=age_labels, right=False)
-    
+    if 'Age' in df_full.columns:
+        df_full['AgeGroup'] = pd.cut(df_full['Age'], bins=age_bins, labels=age_labels, right=False)
+    else:
+        df_full['AgeGroup'] = "Unknown"
     selected_age_group = st.sidebar.selectbox("Age Group", ["All"] + list(age_labels))
     
-    min_income = int(df_full['Income'].min())
-    max_income = int(df_full['Income'].max())
-    income_range = st.sidebar.slider(
-        "Income Range ($)",
-        min_value=min_income,
-        max_value=max_income,
-        value=(min_income, max_income),
-        step=5000
-    )
+    # Grocery Category Filter
+    category_options = ["All", "Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold"]
+    selected_category = st.sidebar.selectbox("Grocery Category", category_options)
     
-    min_spent = int(df_full['TotalMnt'].min())
-    max_spent = int(df_full['TotalMnt'].max())
+    min_spent = int(df_full['TotalMnt'].min()) if 'TotalMnt' in df_full.columns else 0
+    max_spent = int(df_full['TotalMnt'].max()) if 'TotalMnt' in df_full.columns else 10000
     spending_range = st.sidebar.slider(
         "Total Spending Range ($)",
         min_value=min_spent,
@@ -392,25 +541,38 @@ elif page == "Customer Dashboard":
         step=100
     )
     
-    education_options = ["All"] + sorted(df_full['Education'].unique().tolist())
+    education_options = ["All"] + sorted(df_full['Education'].unique().tolist()) if 'Education' in df_full.columns else ["All"]
     selected_education = st.sidebar.selectbox("Education Level", education_options)
-    marital_options = ["All"] + sorted(df_full['Marital_Status'].unique().tolist())
+    marital_options = ["All"] + sorted(df_full['Marital_Status'].unique().tolist()) if 'Marital_Status' in df_full.columns else ["All"]
     selected_marital = st.sidebar.selectbox("Marital Status", marital_options)
     children_options = ["All", "Yes", "No"]
     selected_children = st.sidebar.selectbox("Has Children", children_options)
-    
-    # Apply filters
+
+    # APPLY CATEGORY FILTER 
+    category_col_map = {
+        "Wines": "MntWines",
+        "Fruits": "MntFruits",
+        "Meat": "MntMeatProducts",
+        "Fish": "MntFishProducts",
+        "Sweets": "MntSweetProducts",
+        "Gold": "MntGoldProds"
+    }
+
+    if selected_category != "All":
+        col_name = category_col_map[selected_category]
+        if col_name in df_full.columns:
+            df_full = df_full[df_full[col_name] > 0].copy()
+        else:
+            st.warning(f"Category {selected_category} not found in data.")
+
+    #  APPLY OTHER FILTERS 
     filtered_df = df_full.copy()
     if selected_age_group != "All":
         filtered_df = filtered_df[filtered_df['AgeGroup'] == selected_age_group]
-    filtered_df = filtered_df[
-        (filtered_df['Income'] >= income_range[0]) &
-        (filtered_df['Income'] <= income_range[1])
-    ]
-    filtered_df = filtered_df[
-        (filtered_df['TotalMnt'] >= spending_range[0]) &
-        (filtered_df['TotalMnt'] <= spending_range[1])
-    ]
+    if 'TotalMnt' in filtered_df.columns:
+        filtered_df = filtered_df[
+            (filtered_df['TotalMnt'] >= spending_range[0]) & (filtered_df['TotalMnt'] <= spending_range[1])
+        ]
     if selected_education != "All":
         filtered_df = filtered_df[filtered_df['Education'] == selected_education]
     if selected_marital != "All":
@@ -419,19 +581,20 @@ elif page == "Customer Dashboard":
         filtered_df = filtered_df[filtered_df['Has_Children'] == 1]
     elif selected_children == "No":
         filtered_df = filtered_df[filtered_df['Has_Children'] == 0]
-    
+
     if filtered_df.empty:
         st.warning("No data matches the selected filters.")
         st.stop()
-    
-    # KPIs with colored background
-    avg_spent = filtered_df['TotalMnt'].mean()
-    avg_age = filtered_df['Age'].mean()
-    avg_income = filtered_df['Income'].mean()
-    
+
+    # PLOT MONTHLY SPENDING CHART
+    plot_monthly_spending_line_chart(filtered_df, selected_category)
+
+    # KPIs 
+    avg_spent = filtered_df['TotalMnt'].mean() if 'TotalMnt' in filtered_df.columns else 0
+    avg_age = filtered_df['Age'].mean() if 'Age' in filtered_df.columns else 0
+    avg_income = filtered_df['Income'].mean() if 'Income' in filtered_df.columns else 0
     col1, col2, col3 = st.columns(3)
     kpi_style = "background-color: #FFFFFF; padding: 15px; border-radius: 8px; border-left: 5px solid #FF9800; color: #333333; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"
-
     with col1:
         st.markdown(f"""
         <div style="{kpi_style}">
@@ -469,130 +632,146 @@ elif page == "Customer Dashboard":
 
         col1, col2 = st.columns(2)
         with col1:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                hist_data = filtered_df['Age']
-                kde = gaussian_kde(hist_data)
-                x_vals = np.linspace(hist_data.min(), hist_data.max(), 200)
-                y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 20  # Scale to histogram
+            hist_data = filtered_df['Age']
+            kde = gaussian_kde(hist_data)
+            x_vals = np.linspace(hist_data.min(), hist_data.max(), 200)
+            y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 20  # Scale to histogram
 
-                fig = go.Figure()
-                fig.add_trace(go.Histogram(
-                    x=hist_data,
-                    nbinsx=20,
-                    marker_color=COLORS["accent"],
-                    opacity=0.7,
-                    hovertemplate="<b>Age</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>",
-                    name="Age"
-                ))
-                fig.add_trace(go.Scatter(
-                    x=x_vals,
-                    y=y_kde,
-                    mode='lines',
-                    line=dict(color=COLORS["accent_hover"], width=3),
-                    name="Trend (KDE)"
-                ))
-                fig.update_layout(
-                    title='Age Distribution',
-                    xaxis_title='Age',
-                    yaxis_title='Count',
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"]
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=hist_data,
+                nbinsx=20,
+                marker_color=COLORS["accent"],
+                opacity=0.7,
+                hovertemplate="<b>Age</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>",
+                name="Age"
+            ))
+            fig.add_trace(go.Scatter(
+                x=x_vals,
+                y=y_kde,
+                mode='lines',
+                line=dict(color=COLORS["accent_hover"], width=3),
+                name="Trend (KDE)"
+            ))
+            fig.update_layout(
+                title='Age Distribution',
+                xaxis_title='Age',
+                yaxis_title='Count',
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"]
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            
         
         with col2:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                hist_data = filtered_df['Income']
-                kde = gaussian_kde(hist_data)
-                x_vals = np.linspace(hist_data.min(), hist_data.max(), 200)
-                y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 30
+            hist_data = filtered_df['Income']
+            kde = gaussian_kde(hist_data)
+            x_vals = np.linspace(hist_data.min(), hist_data.max(), 200)
+            y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 30
 
-                fig = go.Figure()
-                fig.add_trace(go.Histogram(
-                    x=hist_data,
-                    nbinsx=30,
-                    marker_color=COLORS["accent"],
-                    opacity=0.7,
-                    hovertemplate="<b>Income</b>: $%{x:,.0f}<br><b>Count</b>: %{y}<extra></extra>",
-                    name="Income"
-                ))
-                fig.add_trace(go.Scatter(
-                    x=x_vals,
-                    y=y_kde,
-                    mode='lines',
-                    line=dict(color=COLORS["accent_hover"], width=3),
-                    name="Trend (KDE)"
-                ))
-                fig.update_layout(
-                    title='Income Distribution',
-                    xaxis_title='Income ($)',
-                    yaxis_title='Count',
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"]
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=hist_data,
+                nbinsx=30,
+                marker_color=COLORS["accent"],
+                opacity=0.7,
+                hovertemplate="<b>Income</b>: $%{x:,.0f}<br><b>Count</b>: %{y}<extra></extra>",
+                name="Income"
+            ))
+            fig.add_trace(go.Scatter(
+                x=x_vals,
+                y=y_kde,
+                mode='lines',
+                line=dict(color=COLORS["accent_hover"], width=3),
+                name="Trend (KDE)"
+            ))
+            fig.update_layout(
+                title='Income Distribution',
+                xaxis_title='Income ($)',
+                yaxis_title='Count',
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"]
+            )
+            st.plotly_chart(fig, use_container_width=True)
 
         col1, col2 = st.columns(2)
         
         with col1:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                edu_counts = filtered_df['Education'].value_counts().reset_index()
-                edu_counts.columns = ['Education', 'Count']
-                fig = px.bar(
-                    edu_counts,
-                    x='Education',
-                    y='Count',
-                    title='Education Level',
-                    color='Count',
-                    color_continuous_scale='Oranges',
-                    labels={'Education': 'Education Level', 'Count': 'Customer Count'}
-                )
-                fig.update_traces(
-                    hovertemplate="<b>Education</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>"
-                )
-                fig.update_layout(
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"],
-                    xaxis_title="Education Level",
-                    yaxis_title="Customer Count"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+            edu_counts = filtered_df['Education'].value_counts().reset_index()
+            edu_counts.columns = ['Education', 'Count']
+            fig = px.bar(
+                edu_counts,
+                x='Education',
+                y='Count',
+                title='Education Level',
+                color='Count',
+                color_continuous_scale='Oranges',
+                labels={'Education': 'Education Level', 'Count': 'Customer Count'}
+            )
+            fig.update_traces(
+                hovertemplate="<b>Education</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Education Level",
+                yaxis_title="Customer Count"
+            )
+            st.plotly_chart(fig, use_container_width=True)
 
         with col2:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                mar_counts = filtered_df['Marital_Status'].value_counts().reset_index()
-                mar_counts.columns = ['Marital Status', 'Count']
-                fig = px.bar(
-                    mar_counts,
-                    x='Marital Status',
-                    y='Count',
-                    title='Marital Status',
-                    color='Count',
-                    color_continuous_scale='Greens',
-                    labels={'Marital Status': 'Marital Status', 'Count': 'Customer Count'}
-                )
-                fig.update_traces(
-                    hovertemplate="<b>Marital Status</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>"
-                )
-                fig.update_layout(
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"],
-                    xaxis_title="Marital Status",
-                    yaxis_title="Customer Count"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True) 
+            mar_counts = filtered_df['Marital_Status'].value_counts().reset_index()
+            mar_counts.columns = ['Marital Status', 'Count']
+            fig = px.bar(
+                mar_counts,
+                x='Marital Status',
+                y='Count',
+                title='Marital Status',
+                color='Count',
+                color_continuous_scale='Greens',
+                labels={'Marital Status': 'Marital Status', 'Count': 'Customer Count'}
+            )
+            fig.update_traces(
+                hovertemplate="<b>Marital Status</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Marital Status",
+                yaxis_title="Customer Count"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+
+        # Bottom expanders for Demographics tab
+        with st.expander("📌 **Key Takeaways**", expanded=False):
+            st.markdown("""
+            👥 Most consumers are **50 years old**  
+            💰 Most common income: **$38.5k**  
+            🎓 Highest education level: **High school graduate**  
+            💍 Most consumers are **married**  
+            """)
+
+        with st.expander("🚀 **Actionable Insights**", expanded=False):
+            st.markdown("""
+            📣 Tailor messaging to **midlife priorities** :
+             - financial security
+             - family
+             - value driven purchases
+                          
+            💰 **Price products** in  affordability thresholds (e.g. payment plans, bundles).  
+                        
+            🎯 **Focus ad targeting** on married, 45–55-year-old audiences on platforms like Facebook or banners.  
+                          
+            📚 **Simplify communication** : avoid jargon, use clear language aligned with high school literacy levels.  
+                        
+            🏡 **Highlight stability & trust** in branding : audience values reliability over novelty.  
+            """)
+
 
        # Tab 2: Purchase Behavior
     with tab2:
@@ -600,402 +779,463 @@ elif page == "Customer Dashboard":
 
         col1, col2 = st.columns(2)
         with col1:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                spending_cols = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
-                spending_means = filtered_df[spending_cols].mean().reset_index()
-                spending_means.columns = ['Category', 'Avg Spending']
-                fig = px.bar(
-                    spending_means,
-                    x='Category',
-                    y='Avg Spending',
-                    title='Spending by Category',
-                    color='Avg Spending',
-                    color_continuous_scale='Blues',
-                    labels={'Category': 'Product Category', 'Avg Spending': 'Average Spending ($)'}
-                )
-                fig.update_traces(
-                    hovertemplate="<b>Category</b>: %{x}<br><b>Avg Spending</b>: $%{y:,.0f}<extra></extra>"
-                )
-                fig.update_layout(
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"],
-                    xaxis_title="Product Category",
-                    yaxis_title="Average Spending ($)"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True) 
-
-        with col2:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                purchase_types = ['NumWebPurchases','NumCatalogPurchases','NumStorePurchases']
-                purchase_means = filtered_df[purchase_types].mean().reset_index()
-                purchase_means.columns = ['Channel', 'Avg Purchases']
-                fig = px.bar(
-                    purchase_means,
-                    x='Channel',
-                    y='Avg Purchases',
-                    title='Purchase Channel Preference',
-                    color='Avg Purchases',
-                    color_continuous_scale='Purples',
-                    labels={'Channel': 'Purchase Channel', 'Avg Purchases': 'Average Purchases'}
-                )
-                fig.update_traces(
-                    hovertemplate="<b>Channel</b>: %{x}<br><b>Avg Purchases</b>: %{y:.1f}<extra></extra>"
-                )
-                fig.update_layout(
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"],
-                    xaxis_title="Purchase Channel",
-                    yaxis_title="Average Purchases"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True) 
-
-        col1, col2 = st.columns(2)
-        with col1:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                fig = px.scatter(
-                    filtered_df,
-                    x='Income',
-                    y='TotalMnt',
-                    color='Has_Children',
-                    hover_data=['Age', 'Education', 'TotalPurchases'],
-                    title='Income vs Total Spending',
-                    labels={'Income': 'Income ($)', 'TotalMnt': 'Total Spending ($)'},
-                    color_discrete_map={0: '#FF9800', 1: '#E65100'}
-                )
-                fig.update_traces(
-                    hovertemplate=(
-                        "<b>Income</b>: $%{x:,.0f}<br>"
-                        "<b>Spending</b>: $%{y:,.0f}<br>"
-                        "<b>Age</b>: %{customdata[0]}<br>"
-                        "<b>Education</b>: %{customdata[1]}<br>"
-                        "<b>Purchases</b>: %{customdata[2]}<extra></extra>"
-                    )
-                )
-                fig.update_layout(
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"],
-                    xaxis_title="Income ($)",
-                    yaxis_title="Total Spending ($)"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True) 
-
-        with col2:  # inside Tab 2, second column of second row
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                hist_data = filtered_df['TotalPurchases']
-                kde = gaussian_kde(hist_data)
-                x_vals = np.linspace(max(0, hist_data.min()), hist_data.max(), 200)
-                y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 20
-
-                fig = go.Figure()
-                fig.add_trace(go.Histogram(
-                    x=hist_data,
-                    nbinsx=20,
-                    marker_color=COLORS["accent"],
-                    opacity=0.7,
-                    hovertemplate="<b>Total Purchases</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>",
-                    name="Total Purchases"
-                ))
-                fig.add_trace(go.Scatter(
-                    x=x_vals,
-                    y=y_kde,
-                    mode='lines',
-                    line=dict(color=COLORS["accent_hover"], width=3),
-                    name="Trend (KDE)"
-                ))
-                fig.update_layout(
-                    title='Total Purchases Distribution',
-                    xaxis_title='Total Purchases',
-                    yaxis_title='Count',
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"]
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True)     
-
-        # Tab 3: Campaign Response
-    with tab3:
-        st.markdown("## 📣 Campaign Response")
-
-        with st.container():
-            st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-            campaign_cols = ['AcceptedCmp1','AcceptedCmp2','AcceptedCmp3','AcceptedCmp4','AcceptedCmp5','Response']
-            acceptance_rates = (filtered_df[campaign_cols].mean() * 100).reset_index()
-            acceptance_rates.columns = ['Campaign', 'Acceptance Rate (%)']
-
+            spending_cols = ['MntWines','MntFruits','MntMeatProducts','MntFishProducts','MntSweetProducts','MntGoldProds']
+            spending_means = filtered_df[spending_cols].mean().reset_index()
+            spending_means.columns = ['Category', 'Avg Spending']
             fig = px.bar(
-                acceptance_rates,
-                x='Campaign',
-                y='Acceptance Rate (%)',
-                title='Campaign Acceptance Rates (%)',
-                color='Acceptance Rate (%)',
-                color_continuous_scale='Reds',
-                labels={'Campaign': 'Campaign', 'Acceptance Rate (%)': 'Acceptance Rate (%)'}
+                spending_means,
+                x='Category',
+                y='Avg Spending',
+                title='Spending by Category',
+                color='Avg Spending',
+                color_continuous_scale='Blues',
+                labels={'Category': 'Product Category', 'Avg Spending': 'Average Spending ($)'}
             )
             fig.update_traces(
-                hovertemplate="<b>Campaign</b>: %{x}<br><b>Acceptance Rate</b>: %{y:.1f}%<extra></extra>"
+                hovertemplate="<b>Category</b>: %{x}<br><b>Avg Spending</b>: $%{y:,.0f}<extra></extra>"
             )
             fig.update_layout(
                 plot_bgcolor=COLORS["card_bg"],
                 paper_bgcolor=COLORS["card_bg"],
                 font_color=COLORS["text_primary"],
-                xaxis_title="Campaign",
-                yaxis_title="Acceptance Rate (%)"
+                xaxis_title="Product Category",
+                yaxis_title="Average Spending ($)"
             )
             st.plotly_chart(fig, use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True) 
+
+        with col2:
+            purchase_types = ['NumWebPurchases','NumCatalogPurchases','NumStorePurchases']
+            purchase_means = filtered_df[purchase_types].mean().reset_index()
+            purchase_means.columns = ['Channel', 'Avg Purchases']
+            fig = px.bar(
+                purchase_means,
+                x='Channel',
+                y='Avg Purchases',
+                title='Purchase Channel Preference',
+                color='Avg Purchases',
+                color_continuous_scale='Purples',
+                labels={'Channel': 'Purchase Channel', 'Avg Purchases': 'Average Purchases'}
+            )
+            fig.update_traces(
+                 hovertemplate="<b>Channel</b>: %{x}<br><b>Avg Purchases</b>: %{y:.1f}<extra></extra>"
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Purchase Channel",
+                yaxis_title="Average Purchases"
+            )
+            st.plotly_chart(fig, use_container_width=True)
 
         col1, col2 = st.columns(2)
         with col1:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                fig = px.scatter(
-                    filtered_df,
-                    x='TotalAcceptedCmp',
-                    y='TotalMnt',
-                    color='TotalAcceptedCmp',
-                    hover_data=['Age', 'Income', 'Has_Children'],
-                    title='Campaigns Accepted vs Spending',
-                    labels={'TotalAcceptedCmp': 'Campaigns Accepted', 'TotalMnt': 'Total Spending ($)'},
-                    color_continuous_scale='YlOrRd'
+            fig = px.scatter(
+                filtered_df,
+                x='Income',
+                y='TotalMnt',
+                color='Has_Children',
+                hover_data=['Age', 'Education', 'TotalPurchases'],
+                title='Income vs Total Spending',
+                labels={'Income': 'Income ($)', 'TotalMnt': 'Total Spending ($)'},
+                color_discrete_map={0: '#FF9800', 1: '#E65100'}
+            )
+            fig.update_traces(
+                hovertemplate=(
+                    "<b>Income</b>: $%{x:,.0f}<br>"
+                    "<b>Spending</b>: $%{y:,.0f}<br>"
+                    "<b>Age</b>: %{customdata[0]}<br>"
+                    "<b>Education</b>: %{customdata[1]}<br>"
+                    "<b>Purchases</b>: %{customdata[2]}<extra></extra>"
                 )
-                fig.update_traces(
-                    hovertemplate=(
-                        "<b>Campaigns Accepted</b>: %{x}<br>"
-                        "<b>Spending</b>: $%{y:,.0f}<br>"
-                        "<b>Age</b>: %{customdata[0]}<br>"
-                        "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
-                        "<b>Has Children</b>: %{customdata[2]}<extra></extra>"
-                    )
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Income ($)",
+                yaxis_title="Total Spending ($)"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col2:  
+            hist_data = filtered_df['TotalPurchases']
+            kde = gaussian_kde(hist_data)
+            x_vals = np.linspace(max(0, hist_data.min()), hist_data.max(), 200)
+            y_kde = kde(x_vals) * len(hist_data) * (hist_data.max() - hist_data.min()) / 20
+
+            fig = go.Figure()
+            fig.add_trace(go.Histogram(
+                x=hist_data,
+                nbinsx=20,
+                marker_color=COLORS["accent"],
+                opacity=0.7,
+                hovertemplate="<b>Total Purchases</b>: %{x}<br><b>Count</b>: %{y}<extra></extra>",
+                name="Total Purchases"
+            ))
+            fig.add_trace(go.Scatter(
+                x=x_vals,
+                y=y_kde,
+                mode='lines',
+                line=dict(color=COLORS["accent_hover"], width=3),
+                name="Trend (KDE)"
+            ))
+            fig.update_layout(
+                title='Total Purchases Distribution',
+                xaxis_title='Total Purchases',
+                yaxis_title='Count',
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"]
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        # Bottom expanders for begaviour tab
+        with st.expander("📌 **Key Takeaways**", expanded=False):
+            st.markdown("""
+            🍷 **Top Grocery Category**: **Wine**  
+                         
+            🛒 **Channel Preference**:  
+            - **In-store** purchases lead, but **online** is close behind  
+                        
+            📈 Higher income strongly correlates with higher spending  
+                        
+            ⚖️ **Spend Distribution**: Highly uneven, a small group drives most revenue  
+            """)
+            
+        with st.expander("🚀 **Actionable Insights**", expanded=False):
+            st.markdown("""
+            🍷 **Leverage wine dominance**:  
+            - Create curated bundles (e.g., wine + cheese)  
+            - a loyalty tier for wine buyers  
+                        
+            🌐 **Bridge online & offline**:  
+            - Enable “buy online, pick up in-store” to capture hybrid shoppers.  
+  
+            🎯 **Target high-income segments**:  
+            -  tailored ads showcasing premium products and services.   
+                        
+            📊 **Implement loyalty programs**:
+            - encourage repeat purchases among top spenders.  
+            """)         
+
+        # Tab 3: Campaign Response
+    with tab3:
+        st.markdown("## 📣 Campaign Response")
+        campaign_cols = ['AcceptedCmp1','AcceptedCmp2','AcceptedCmp3','AcceptedCmp4','AcceptedCmp5','Response']
+        acceptance_rates = (filtered_df[campaign_cols].mean() * 100).reset_index()
+        acceptance_rates.columns = ['Campaign', 'Acceptance Rate (%)']
+
+        fig = px.bar(
+            acceptance_rates,
+            x='Campaign',
+            y='Acceptance Rate (%)',
+            title='Campaign Acceptance Rates (%)',
+            color='Acceptance Rate (%)',
+            color_continuous_scale='Reds',
+            labels={'Campaign': 'Campaign', 'Acceptance Rate (%)': 'Acceptance Rate (%)'}
+        )
+        fig.update_traces(
+            hovertemplate="<b>Campaign</b>: %{x}<br><b>Acceptance Rate</b>: %{y:.1f}%<extra></extra>"
+        )
+        fig.update_layout(
+            plot_bgcolor=COLORS["card_bg"],
+            paper_bgcolor=COLORS["card_bg"],
+            font_color=COLORS["text_primary"],
+            xaxis_title="Campaign",
+            yaxis_title="Acceptance Rate (%)"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            
+            fig = px.scatter(
+                filtered_df,
+                x='TotalAcceptedCmp',
+                y='TotalMnt',
+                color='TotalAcceptedCmp',
+                hover_data=['Age', 'Income', 'Has_Children'],
+                title='Campaigns Accepted vs Spending',
+                labels={'TotalAcceptedCmp': 'Campaigns Accepted', 'TotalMnt': 'Total Spending ($)'},
+                color_continuous_scale='YlOrRd'
+            )
+            fig.update_traces(
+                hovertemplate=(
+                    "<b>Campaigns Accepted</b>: %{x}<br>"
+                    "<b>Spending</b>: $%{y:,.0f}<br>"
+                    "<b>Age</b>: %{customdata[0]}<br>"
+                    "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
+                    "<b>Has Children</b>: %{customdata[2]}<extra></extra>"
                 )
-                fig.update_layout(
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"],
-                    xaxis_title="Campaigns Accepted",
-                    yaxis_title="Total Spending ($)"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True) 
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Campaigns Accepted",
+                yaxis_title="Total Spending ($)"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            
 
         with col2:
-            with st.container():
-                st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                fig = px.scatter(
-                    filtered_df,
-                    x='NumWebVisitsMonth',
-                    y='TotalPurchases',
-                    color='NumWebVisitsMonth',
-                    hover_data=['Age', 'Income', 'TotalMnt'],
-                    title='Web Visits vs Total Purchases',
-                    labels={'NumWebVisitsMonth': 'Monthly Web Visits', 'TotalPurchases': 'Total Purchases'},
-                    color_continuous_scale='Oranges'
+            
+            fig = px.scatter(
+                filtered_df,
+                x='NumWebVisitsMonth',
+                y='TotalPurchases',
+                color='NumWebVisitsMonth',
+                hover_data=['Age', 'Income', 'TotalMnt'],
+                title='Web Visits vs Total Purchases',
+                labels={'NumWebVisitsMonth': 'Monthly Web Visits', 'TotalPurchases': 'Total Purchases'},
+                color_continuous_scale='Oranges'
+            )
+            fig.update_traces(
+                hovertemplate=(
+                    "<b>Web Visits</b>: %{x}<br>"
+                    "<b>Purchases</b>: %{y}<br>"
+                    "<b>Age</b>: %{customdata[0]}<br>"
+                    "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
+                    "<b>Spending</b>: $%{customdata[2]:,.0f}<extra></extra>"
                 )
-                fig.update_traces(
-                    hovertemplate=(
-                        "<b>Web Visits</b>: %{x}<br>"
-                        "<b>Purchases</b>: %{y}<br>"
-                        "<b>Age</b>: %{customdata[0]}<br>"
-                        "<b>Income</b>: $%{customdata[1]:,.0f}<br>"
-                        "<b>Spending</b>: $%{customdata[2]:,.0f}<extra></extra>"
-                    )
-                )
-                fig.update_layout(
-                    plot_bgcolor=COLORS["card_bg"],
-                    paper_bgcolor=COLORS["card_bg"],
-                    font_color=COLORS["text_primary"],
-                    xaxis_title="Monthly Web Visits",
-                    yaxis_title="Total Purchases"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+            )
+            fig.update_layout(
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"],
+                xaxis_title="Monthly Web Visits",
+                yaxis_title="Total Purchases"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            
 
-        # Tab 4: Clustering & Marketing
+        with st.expander("📌 **Key Takeaways**", expanded=False):
+            st.markdown("""
+            📊 Higher spenders tend to accept more campaigns.  
+            🌐 High web traffic does NOT guarantee high purchases.  
+            ✅ **Browsers** are not **buyers**.  
+            🛒 **Loyal but rare web browser** buyers are dominant.  
+            """)
+            
+        with st.expander("🚀 **Actionable Insights**", expanded=False):
+            st.markdown("""
+            🌐For **browsers**: 
+            - high visits, low purchases
+            - Use retargeting with product recommendations based on browsing history 
+            - e.g. “You viewed this last week still interested? 👀 ”  
+                        
+
+            🌟 For **loyal** buyers: 
+            - low visits, high purchases
+            - Reward them with fast checkout, loyalty points, or surprise gifts to reinforce their behavior.  
+                        
+
+            🛍️ For **mid range** shoppers: 
+            - Test limited-time offers or “free shipping on your next order” to nudge them toward more frequent purchases.
+            """)
+
+
+   #Clustering & Marketing tab
     with tab4:
         scaler, pca, clusterer, cluster_profiles, supervised_model = load_models()
         if cluster_profiles is not None and len(cluster_profiles) == 2:
-            st.markdown("## 🧩 Customer Personas (2 Strategic Clusters)")
+            st.markdown("## 🧩 Customer Persona")
 
             # Define rich, actionable insights per cluster
             cluster_insights = {
                 0: {
-                    "name": "Responsive High Spenders",
+                    "name": "👨‍👩‍👧‍👦 Budget-Conscious Parent",
                     "profile": [
-                        "✅ **Higher income** and **younger** demographic",
-                        "✅ **Actively engages** with promotional campaigns",
-                        "✅ **High total spending** and responds to multiple offers",
-                        "✅ Prefers **premium, experiential** products",
-                        "✅ Open to **experimentation** and new launches"
+                        "  **Family-oriented**, often with children at home",
+                        "  **Frequent but low-spend** transactions — necessity-driven",
+                        "  **Long-term, loyal** customer ",
+                        "🌐 **Visits website often** — uses it for research/comparison",
+                        "🔕 **Ignores most promotional campaigns** — filters out “noise”"
                     ],
                     "why_it_matters": [
-                        "• Campaigns work because they align with their lifestyle — offers feel **relevant, not intrusive**",
-                        "• Digital engagement **directly converts** — ideal for retargeting and personalization",
-                        "• They’re your **growth engine** for premium product adoption"
+                        " They’re **not disengaged** —  **actively browsing** but avoiding hype",
+                        " Promotions fail because they feel **irrelevant or overwhelming**",
+                        " They want **utility, trust, and convenience** — not flashy banners",
+                        " They’re your **retention core** — but need the right triggers to convert"
                     ],
                     "marketing": [
-                        "🎯 Deliver **personalized dynamic content**: “For you”, “Recommended based on your style”",
-                        "✨ Offer **flash sales, early access, VIP tiers** — exclusivity drives action",
-                        "📣 Leverage **social proof**: bestsellers, reviews, influencer collaborations",
-                        "🛒 **Upsell/cross-sell** at checkout — they’re willing to increase basket size",
-                        "📲 Use **lifestyle-aligned retargeting** — not just discounts, but experiences"
+                        " Use **contextual nudges**: “Based on your recent views…”, “Top picks for families like yours”",
+                        "🔍 **Improve filtering & search** — help them find what they need in <10 seconds",
+                        "🎖️ **Show loyalty points** on every visit/purchase — reinforce long-term value",
+                    "📧 Trigger **helpful emails**: restock alerts, “you viewed this last week”, abandoned cart",
+                    "🚫 **Avoid discount-heavy messaging** — focus on **practicality, reliability, and ease**"
                     ]
                 },
                 1: {
-                    "name": "Budget-Conscious Parent",
+                    "name": " 💰Responsive High Spenders",
                     "profile": [
-                        "👨‍👩‍👧‍👦 **Family-oriented**, typically with children at home",
-                        "🛒 **Frequent but low-spend** transactions — driven by necessity",
-                        "⏱️ **Long-term, loyal** customer (high tenure)",
-                        "🌐 **Visits website often** — uses it for research and price comparison",
-                        "🔕 **Ignores most promotional banners** — filters out “sales noise”"
+                        "  **Higher income** and **younger** demographic",
+                        "  **Actively engages** with promotional campaigns",
+                        " 💵 **High total spending** and **responds to 2+ campaigns** on average",
+                        " ✨ Prefers **experiential, premium** offerings",
+                        " 📣 Open to **experimentation** and new product discovery"
                     ],
                     "why_it_matters": [
-                        "• They’re **not disengaged** — they’re **actively browsing** but avoiding hype",
-                        "• Promotions fail because they feel **overwhelming or irrelevant**",
-                        "• They seek **utility, trust, and convenience** — not flashy deals",
-                        "• They’re your **retention core** — but need the right triggers to convert"
+                        " Campaigns matches their lifestyle, seeing offers as **value**",
+                        " Digital engagement **directly converts** — ideal for retargeting",
+                        " **Growth engine** for new premium launches"
                     ],
                     "marketing": [
-                        "🧭 Use **contextual, helpful nudges**: “Based on your recent views…”, “Top picks for families like yours”",
-                        "🔍 **Improve product filtering & categorization** — help them find what they need in seconds",
-                        "🎖️ **Show loyalty points earned** on every visit or purchase — reinforce long-term value",
-                        "📧 Trigger **utility-driven emails**: restock alerts, “you viewed this last week”, abandoned cart",
-                        "🚫 **Avoid discount-heavy or flashy banners** — focus on **practicality, reliability, and ease**"
+                        "🎯 **Personalize dynamically**: “Recommended for you”, “Based on your style”",
+                        "✨ Offer **flash sales, early access, VIP tiers** — exclusivity drives action",
+                        "📣 Use **social proof**: bestsellers, reviews, influencer tags",
+                        "🛒 **Upsell/cross-sell** at checkout ",
+                        "📲 Retarget with **lifestyle-aligned** creatives"
                     ]
                 }
             }
 
-            cols = st.columns(2)
-            for cluster_id in [0, 1]:
-                with cols[cluster_id]:
-                    with st.container():
-                        st.markdown('<div class="eda-card">', unsafe_allow_html=True)
-                        insight = cluster_insights[cluster_id]
-                        st.markdown(f"### Cluster {cluster_id}: {insight['name']}")
-                        # Profile
-                        st.markdown("#### 👤 Behavioral Profile")
-                        for point in insight["profile"]:
-                            st.markdown(f"- {point}")
-                        # Why This Matters
-                        with st.expander("💡 Why This Matters"):
-                            for point in insight["why_it_matters"]:
-                                st.markdown(f"- {point}")
-                        # Radar Chart
-                        categories = list(cluster_profiles.columns)
-                        N = len(categories)
-                        angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
-                        values = cluster_profiles.loc[cluster_id].values.flatten().tolist()
-                        values += values[:1]
-                        angles += angles[:1]
-                        fig = go.Figure(
-                            data=go.Scatterpolar(
-                                r=values,
-                                theta=categories + [categories[0]],
-                                fill='toself',
-                                line_color=COLORS["accent"],
-                                hoverinfo='text',
-                                text=[f"{cat}: {val:.2f}" for cat, val in zip(categories, cluster_profiles.loc[cluster_id])]
-                            )
-                        )
-                        fig.update_layout(
-                            polar=dict(
-                                radialaxis=dict(visible=True, range=[0, 1]),
-                                angularaxis=dict(direction="clockwise")
-                            ),
-                            showlegend=False,
-                            title=f"Behavioral Profile",
-                            plot_bgcolor=COLORS["card_bg"],
-                            paper_bgcolor=COLORS["card_bg"],
-                            font_color=COLORS["text_primary"]
-                        )
-                        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-                        # Marketing Strategy
-                        with st.expander("💼 Recommended Marketing Strategy"):
-                            st.markdown("#### Actionable Tactics:")
-                            for tactic in insight["marketing"]:
-                                st.markdown(f"- {tactic}")
-                        st.markdown('</div>', unsafe_allow_html=True)
-                    # Close card
-                    st.markdown(CLOSE_CARD, unsafe_allow_html=True)
-            # === Heatmap & Model Performance (unchanged logic, just below personas) ===
-            st.markdown("### 🌡️ Feature Normalization Heatmap")
-            df_heatmap = cluster_profiles.reset_index()
-            df_heatmap.columns.name = None
-            df_melted = df_heatmap.melt(id_vars=df_heatmap.columns[0], var_name='Feature', value_name='Value')
-            fig = px.density_heatmap(
-                df_melted,
-                x='Feature',
-                y=df_heatmap.columns[0],
-                z='Value',
-                title='Cluster Feature Comparison (Normalized)',
-                color_continuous_scale='YlGnBu',
-                labels={'Feature': 'Feature', df_heatmap.columns[0]: 'Cluster', 'Value': 'Normalized Value'}
-            )
-            fig.update_traces(
-                hovertemplate="<b>Cluster</b>: %{y}<br><b>Feature</b>: %{x}<br><b>Value</b>: %{z:.2f}<extra></extra>"
-            )
-            fig.update_layout(
-            plot_bgcolor=COLORS["card_bg"],
-            paper_bgcolor=COLORS["card_bg"],
-            font_color=COLORS["text_primary"]
-            )
-            
-            st.plotly_chart(fig, use_container_width=True)
-            
-            st.markdown("## 📈 Model Performance")
-            metrics = load_model_metrics()
-            if metrics:
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.metric("Silhouette Score (Clustering)", f"{metrics.get('silhouette_score', 'N/A'):.3f}")
-                    st.caption("Measures cluster separation (higher = better)")
-                if 'logistic_accuracy' in metrics:
-                    with col2:
-                        st.metric("Logistic Regression Accuracy", f"{metrics['logistic_accuracy']:.2%}")
-                        st.caption("Classification performance on test set")
-                    
-                    class_metrics = {
-                        "Precision": metrics.get("logistic_precision", 0),
-                        "Recall": metrics.get("logistic_recall", 0),
-                        "F1-Score": metrics.get("logistic_f1", 0)
-                    }
-                    st.dataframe(pd.DataFrame([class_metrics]).T.rename(columns={0: "Score"}))
-                    
-                    if "confusion_matrix" in metrics:
-                        cm = np.array(metrics["confusion_matrix"])
-                        fig = px.imshow(
-                            cm,
-                            text_auto=True,
-                            labels=dict(x="Predicted", y="Actual"),
-                            x=["Budget-Conscious Parent", "Responsive High Spenders"],
-                            y=["Budget-Conscious Parent", "Responsive High Spenders"],
-                            color_continuous_scale="Blues",
-                            title="Confusion Matrix"
-                        )
-                        fig.update_layout(
-                            plot_bgcolor=COLORS["background"],
-                            paper_bgcolor=COLORS["background"],
-                            font_color=COLORS["text_primary"]
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("Model metrics not found. Place `model_metrics.json` in the `models/` folder.")
-        else:
-            st.error("Clustering model not found or not 2 clusters.")
+        def display_cluster(cluster_id):
+            insight = cluster_insights[cluster_id]
+            model_id = cluster_id + 1  # show Cluster 1 / Cluster 2
 
-# =============================================================================
+            st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+
+            # Header with forced line break
+            st.markdown(
+                f"""
+                <h3 style='margin-bottom: 10px;'>
+                    Cluster {model_id}:<br>
+                    <span style="font-weight:700;">{insight['name']}</span>
+                </h3>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # Behavioral Profile
+            st.markdown("### 👤 Behavioral Profile")
+            for point in insight["profile"]:
+                st.markdown(f"- {point}")
+
+            # Why This Matters 
+            with st.expander("💡 Why This Matters"):
+                for point in insight["why_it_matters"]:
+                    st.markdown(f"- {point}")
+
+            # Radar Chart
+            categories = list(cluster_profiles.columns)
+            values = cluster_profiles.loc[cluster_id].values.flatten().tolist()
+            values += values[:1]
+
+            fig = go.Figure(
+                data=go.Scatterpolar(
+                    r=values,
+                    theta=categories + [categories[0]],
+                    fill='toself',
+                    line_color=COLORS["accent"],
+                    hoverinfo='text',
+                    text=[f"{cat}: {val:.2f}" for cat, val in zip(categories, cluster_profiles.loc[cluster_id])],
+                )
+            )
+
+            fig.update_layout(
+                polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
+                showlegend=False,
+                title="Behavioral Profile",
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"],
+            )
+
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+            # Marketing Strategy
+            with st.expander("💼 Recommended Marketing Strategy"):
+                st.markdown("#### Actionable Tactics:")
+                for tactic in insight["marketing"]:
+                    st.markdown(f"- {tactic}")
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        # Render Columns Cleanly 
+        col1, col2 = st.columns(2)
+
+        with col1:
+            display_cluster(0)  
+
+        with col2:
+            display_cluster(1)  
+
+        # MAIN COMPARISONS SECTION
+        st.markdown("### 🔍 Main Comparisons")
+
+        # Create two columns: radar chart + description
+        col_radar, col_desc = st.columns([2, 1])
+
+        # Radar chart (overlapping)
+        with col_radar:
+            categories = list(cluster_profiles.columns)
+            fig = go.Figure()
+            for cluster_id in [0, 1]:
+                values = cluster_profiles.loc[cluster_id].values.flatten().tolist()
+                values += values[:1]  # close the loop
+                theta = categories + [categories[0]]
+                color = COLORS["accent"] if cluster_id == 0 else "#4CAF50"
+                fig.add_trace(go.Scatterpolar(
+                    r=values,
+                    theta=theta,
+                    fill='toself',
+                    name=f'Cluster {cluster_id}',
+                    line_color=color
+                ))
+            fig.update_layout(
+                polar=dict(
+                    radialaxis=dict(visible=True, range=[0, 1]),
+                    angularaxis=dict(direction="clockwise")
+                ),
+                showlegend=True,
+                title="Cluster Comparison",
+                plot_bgcolor=COLORS["card_bg"],
+                paper_bgcolor=COLORS["card_bg"],
+                font_color=COLORS["text_primary"]
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        # Description
+        with col_desc:
+            st.markdown("""
+            **Key Differences:**
+            - **Cluster 1**: Family-focused, loyal, browses often but ignores flashy campaigns.
+            - **Cluster 2**: Higher income, younger, responds to promotions, spends more.
+
+           **Strategic Implication:**  
+            Tailor messaging:  
+            → **Cluster 1**: Practicality, trust, convenience  
+            → **Cluster 2**: Exclusivity, personalization  
+            """)
+        # Heatmap 
+        st.markdown("### 🌡️ Feature Normalization Heatmap")
+        df_heatmap = cluster_profiles.reset_index()
+        df_heatmap.columns.name = None
+        df_melted = df_heatmap.melt(id_vars=df_heatmap.columns[0], var_name='Feature', value_name='Value')
+        fig = px.density_heatmap(
+            df_melted,
+            x='Feature',
+            y=df_heatmap.columns[0],
+            z='Value',
+            title='Cluster Feature Comparison (Normalized)',
+            color_continuous_scale='YlGnBu',
+            labels={'Feature': 'Feature', df_heatmap.columns[0]: 'Cluster', 'Value': 'Normalized Value'}
+        )
+        fig.update_traces(
+            hovertemplate="<b>Cluster</b>: %{y}<br><b>Feature</b>: %{x}<br><b>Value</b>: %{z:.2f}<extra></extra>"
+        )
+        fig.update_layout(
+        plot_bgcolor=COLORS["card_bg"],
+        paper_bgcolor=COLORS["card_bg"],
+        font_color=COLORS["text_primary"]
+        )
+            
+        st.plotly_chart(fig, use_container_width=True)
+            
+
 # PREDICT CUSTOMER SEGMENT
-# =============================================================================
 elif page == "Predict Customer Segment":
     st.title("🔮 Predict Customer Segment")
     scaler, pca, clusterer, cluster_profiles, supervised_model = load_models()
@@ -1003,47 +1243,47 @@ elif page == "Predict Customer Segment":
         st.error("Models or cluster profiles not loaded.")
         st.stop()
 
-    # Define rich descriptions and insights (aligned with CONFIG but enhanced)
+    # Define rich descriptions and insights 
     cluster_insights = {
-        0: {
-            "name": "Responsive High Spenders",
+        1: {
+            "name": " 💰Responsive High Spenders",
             "profile": [
-                "✅ **Higher income** and **younger** demographic",
-                "✅ **Actively engages** with promotional campaigns",
-                "✅ **High total spending** and **responds to 2+ campaigns** on average",
-                "✅ Prefers **experiential, premium** offerings",
-                "✅ Open to **experimentation** and new product discovery"
+                "  **Higher income** and **younger** demographic",
+                "  **Actively engages** with promotional campaigns",
+                " 💵 **High total spending** and **responds to 2+ campaigns** on average",
+                " ✨ Prefers **experiential, premium** offerings",
+                " 📣 Open to **experimentation** and new product discovery"
             ],
             "why_it_matters": [
-                "• Campaigns work because they match their lifestyle — they see offers as **value**, not noise",
-                "• Digital engagement **directly converts** — ideal for retargeting",
-                "• They’re your **growth engine** for new premium launches"
+                " Campaigns matches their lifestyle, seeing offers as **value**",
+                " Digital engagement **directly converts** — ideal for retargeting",
+                " **Growth engine** for new premium launches"
             ],
             "marketing": [
                 "🎯 **Personalize dynamically**: “Recommended for you”, “Based on your style”",
                 "✨ Offer **flash sales, early access, VIP tiers** — exclusivity drives action",
                 "📣 Use **social proof**: bestsellers, reviews, influencer tags",
-                "🛒 **Upsell/cross-sell** at checkout — they’re willing to spend more",
+                "🛒 **Upsell/cross-sell** at checkout ",
                 "📲 Retarget with **lifestyle-aligned** creatives (not just discounts)"
             ]
         },
-        1: {
-            "name": "Budget-Conscious Parent",
+        2: {
+            "name": "👨‍👩‍👧‍👦 Budget-Conscious Parent",
             "profile": [
-                "👨‍👩‍👧‍👦 **Family-oriented**, often with children at home",
-                "🛒 **Frequent but low-spend** transactions — necessity-driven",
-                "⏱️ **Long-term, loyal** customer (high Days_Customer)",
+                "  **Family-oriented**, often with children at home",
+                "  **Frequent but low-spend** transactions — necessity-driven",
+                "  **Long-term, loyal** customer ",
                 "🌐 **Visits website often** — uses it for research/comparison",
                 "🔕 **Ignores most promotional campaigns** — filters out “noise”"
             ],
             "why_it_matters": [
-                "• They’re **not disengaged** — they’re **actively browsing** but avoiding hype",
-                "• Promotions fail because they feel **irrelevant or overwhelming**",
-                "• They want **utility, trust, and convenience** — not flashy banners",
-                "• They’re your **retention core** — but need the right triggers to convert"
+                " They’re **not disengaged** — they’re **actively browsing** but avoiding hype",
+                " Promotions fail because they feel **irrelevant or overwhelming**",
+                " They want **utility, trust, and convenience** — not flashy banners",
+                " They’re your **retention core** — but need the right triggers to convert"
             ],
             "marketing": [
-                "🧭 Use **contextual nudges**: “Based on your recent views…”, “Top picks for families like yours”",
+                "  Use **contextual nudges**: “Based on your recent views…”, “Top picks for families like yours”",
                 "🔍 **Improve filtering & search** — help them find what they need in <10 seconds",
                 "🎖️ **Show loyalty points** on every visit/purchase — reinforce long-term value",
                 "📧 Trigger **helpful emails**: restock alerts, “you viewed this last week”, abandoned cart",
@@ -1088,7 +1328,7 @@ elif page == "Predict Customer Segment":
             insight = cluster_insights[pred_label]
             segment_name = insight["name"]
 
-            # Confidence (if available)
+            # Confidence 
             confidence_msg = ""
             if supervised_model is not None and hasattr(supervised_model, "predict_proba"):
                 proba = supervised_model.predict_proba(scaled)[0]
@@ -1148,8 +1388,6 @@ elif page == "Predict Customer Segment":
         except Exception as e:
             st.error(f"Prediction error: {e}") 
 
-# =============================================================================
 # Footer
-# =============================================================================
 st.markdown("---")
 st.caption("💡 Powered by binary customer segmentation using Logistic Regression and KMeans.")
