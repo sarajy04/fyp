@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -87,118 +86,133 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown(f"""
+st.markdown(
+f"""
 <style>
-    /* Global background and text colors */
-    .stApp {{
-        background-color: {COLORS['background']} !important;
-    }}
-    h1, h2, h3, h4, h5, h6, p, div {{
-        color: {COLORS['text_primary']} !important;
-    }}
 
-    /* REMOVE EXTRA TOP SPACING */
-    .st-emotion-cache-1v0mbdj, 
-    .st-emotion-cache-1wmy9hl, 
-    .stMarkdown, 
-    .element-container {{
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }}
+/* GLOBAL COLORS & BASE TYPOGRAPHY*/
+.stApp {{
+    background-color: {COLORS['background']} !important;
+}}
+h1, h2, h3, h4, h5, h6, p, div {{
+    color: {COLORS['text_primary']} !important;
+}}
 
-    /* ✅ Main EDA Card Styling */
-    .eda-card {{
-        background-color: #fffaf0 !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
-        margin: 10px 0 20px 0 !important;
-        border: 1px solid #e5decf !important;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 100%;
-    }}
+/* Remove Streamlit spacing */
+.st-emotion-cache-1v0mbdj,
+.st-emotion-cache-1wmy9hl,
+.element-container,
+.block-container {{
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}}
 
-    /* ✅ Responsive column wrapping */
+/* COLUMN LAYOUT FIX (SAFE VERSION) */
+[data-testid="column"],
+[data-testid="column"] > div,
+[data-testid="column"] > div > div {{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+}}
+
+[data-testid="column"] > div {{
+    background-color: #fffaf0 !important;
+    border-radius: 14px !important;
+    padding: 18px !important;
+    border: 1px solid #e5decf !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}}
+
+[data-testid="column"] > div > div:first-child {{
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}}
+
+/* EDA CARD */
+.eda-card {{
+    background-color: #fffaf0 !important;
+    border-radius: 14px !important;
+    padding: 20px !important;
+    margin-bottom: 22px !important;
+    border: 1px solid #e5decf !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+}}
+
+h3.cluster-header {{
+    line-height: 1.4 !important;
+    margin-bottom: 0.6rem !important;
+    font-weight: 700 !important;
+}}
+h3.cluster-header span {{
+    display: block !important;
+}}
+
+/* EXPANDER */
+.stExpander {{
+    background-color: #fff7e6 !important;
+    border-radius: 12px !important;
+    border: 1px solid #f0e6d6 !important;
+    margin-bottom: 1rem !important;
+    position: relative !important;
+}}
+
+.stExpander::before {{
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 6px;
+    background-color: #E8C16D;
+    border-radius: 12px 0 0 12px;
+}}
+
+.stExpander > details > summary {{
+    background-color: #fff7e6 !important;
+    font-weight: 700 !important;
+    color: #5a4635 !important;
+    padding: 14px 18px !important;
+    list-style: none !important;
+}}
+.stExpander summary::-webkit-details-marker {{
+    display: none !important;
+}}
+
+.stExpander > details > summary + div,
+.st-expanderContent {{
+    background-color: #fffaf0 !important;
+    padding: 16px 20px !important;
+    margin: 0 !important;
+    border-radius: 0 0 12px 12px !important;
+}}
+
+/* CTA */
+.cta-box {{
+    background-color: #C8E5EE !important;
+    padding: 22px !important;
+    border-radius: 12px !important;
+    border: 1px solid #b8e6b8 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+    text-align: center !important;
+    margin: 20px 0 !important;
+}}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 900px) {{
     [data-testid="column"] {{
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
+        width: 100% !important;
+        flex-direction: column !important;
     }}
+}}
 
-    /* ✅ EXPANDER — FULL LIGHT BEIGE + GOLD ACCENT */
-    .stExpander {{
-        background-color: #fff7e6 !important;
-        border-radius: 10px !important;
-        border: 1px solid #f0e6d6 !important;
-        margin-bottom: 1rem !important;
-        overflow: hidden !important;
-        position: relative;
-    }}
-
-    /* Left accent bar */
-    .stExpander::before {{
-        content: "";
-        position: absolute;
-        inset: 0 0 0 0;
-        width: 6px;
-        height: 100%;
-        background-color: #E8C16D;
-        border-radius: 10px 0 0 10px;
-    }}
-
-    /* Expander header bar */
-    .stExpander > details > summary {{
-        background-color: #fff7e6 !important;
-        font-weight: 700 !important;
-        color: #5a4635 !important;
-        padding: 14px 16px !important;
-        border-radius: 10px !important;
-        position: relative;
-        z-index: 2;
-        list-style: none !important;
-    }}
-
-    /* Remove default arrow spacing */
-    .stExpander summary::-webkit-details-marker {{
-        display: none !important;
-    }}
-
-    /* ✅ Expander content — handles all Streamlit versions */
-    .stExpander > details > summary + div,
-    .st-expanderContent,
-    .st-expanderContent > div {{
-        background-color: #fffaf0 !important;
-        padding: 16px 18px !important;
-        border-radius: 0 0 10px 10px !important;
-        margin-top: 0 !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
-        position: relative;
-        z-index: 1;
-    }}
-
-    /* ✅ Soft wrapper */
-    .card-soft {{
-        background-color: #faf9f6 !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
-        margin-bottom: 20px !important;
-        border: 1px solid #e0e0e0 !important;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
-    }}
-
-    /* ✅ Cluster header fix */
-    h3.cluster-header {{
-        line-height: 1.4;
-        margin-bottom: 0.6rem;
-        font-weight: 700;
-    }}
-    h3.cluster-header span {{
-        display: block;
-    }}
 </style>
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True
+)
 
 
 # User Authentication
@@ -278,6 +292,13 @@ if not st.session_state.logged_in:
             else:
                 st.error("❌ Invalid username or password")
     st.stop()
+# Logout
+col1, col2 = st.columns([6, 1])
+with col2:
+    if st.button("🚪 Logout"):
+        st.session_state.logged_in = False
+        st.session_state.username = ""
+        st.rerun()
 
 # GLOBAL HEADER BANNER
 if st.session_state.logged_in:
@@ -336,15 +357,8 @@ if st.session_state.logged_in:
         <h1>CoreCart</h1>
         <p>- Turn Exploration into Actions -</p>
     </div>
+    <p class="made-by">Made by Sara Fuah Jin-Yin</p>
     """, unsafe_allow_html=True)
-
-# Logout
-col1, col2 = st.columns([6, 1])
-with col2:
-    if st.button("🚪 Logout"):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        st.rerun()
 
 # Preprocessing Function
 def preprocess_for_eda(df_raw):
@@ -456,7 +470,16 @@ def plot_monthly_spending_line_chart(filtered_df, selected_category="All"):
 
 # Navigation
 st.sidebar.header("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Customer Dashboard", "Predict Customer Segment"])
+current_page = st.session_state.get("page", "Home")
+
+page = st.sidebar.radio(
+    "Go to",
+    ["Home", "Customer Dashboard", "Predict Customer Segment"],
+    index=["Home", "Customer Dashboard", "Predict Customer Segment"].index(current_page)
+)
+
+# keep sidebar and session_state in sync
+st.session_state["page"] = page
 
 # HOME PAGE
 if page == "Home":
@@ -475,16 +498,71 @@ if page == "Home":
     st.markdown("---") 
 
     st.markdown("""
-    ## 🎯 Introduction
-    This system segments customers into **two distinct groups** using machine learning:
-    - **Budget Segment**: Value-conscious, price-sensitive shoppers
-    - **Premium Segment**: High-income, brand-loyal customers
-    
-    Insights help tailor marketing, improve retention, and boost ROI.
-    """)
-    
+    ### 🔎 Core Features of CoreCart
+
+    <div style='display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;'>
+
+    <div style='
+        flex: 1; 
+        min-width: 260px; 
+        background: #fffef8; 
+        padding: 22px; 
+        border-radius: 14px; 
+        border: 2px solid #E8C16D; 
+        box-shadow: 0 3px 10px rgba(0,0,0,0.07); 
+        text-align: center;
+    '>
+        <h4 style='margin-top: 0;'> Segment Shoppers Instantly </h4>
+        <p style='margin-bottom: 0;'>Identify families, premium spenders, deal-seekers, and highly engaged digital users in seconds.</p>
+    </div>
+
+    <div style='
+        flex: 1; 
+        min-width: 260px; 
+        background: #fffef8; 
+        padding: 22px; 
+        border-radius: 14px; 
+        border: 2px solid #E8C16D; 
+        box-shadow: 0 3px 10px rgba(0,0,0,0.07); 
+        text-align: center;
+    '>
+        <h4 style='margin-top: 0;'> Optimize Promotions </h4>
+        <p style='margin-bottom: 0;'>Send the right campaign to the right customer, avoiding wasted promos and discount abuse.</p>
+    </div>
+
+    <div style='
+        flex: 1; 
+        min-width: 260px; 
+        background: #fffef8; 
+        padding: 22px; 
+        border-radius: 14px; 
+        border: 2px solid #E8C16D; 
+        box-shadow: 0 3px 10px rgba(0,0,0,0.07); 
+        text-align: center;
+    '>
+        <h4 style='margin-top: 0;'> Predict New Customer Personas </h4>
+        <p style='margin-bottom: 0;'>Instantly categorize new customers using our Machine Learning prediction tool.</p>
+    </div>
+
+    <div style='
+    flex: 1; 
+        min-width: 260px; 
+        background: #fffef8; 
+        padding: 22px; 
+        border-radius: 14px; 
+        border: 2px solid #E8C16D; 
+        box-shadow: 0 3px 10px rgba(0,0,0,0.07); 
+        text-align: center;
+    '>
+        <h4 style='margin-top: 0;'> Strengthen Marketing Strategy </h4>
+        <p style='margin-bottom: 0;'>Understand how browsing, store visits, and purchases connect across channels.</p>
+    </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown("---")
-    st.subheader("📊 Dataset Overview")
+    st.subheader("📌 Dataset Overview")
     df_raw = load_raw_data()
     if df_raw is not None:
         df_home = preprocess_for_eda(df_raw)
@@ -492,16 +570,83 @@ if page == "Home":
         st.dataframe(df_home[FEATURES].head(3))
     else:
         st.error("Dataset not found. Place `marketing_campaign.csv` in the project root.")
-
-    st.markdown("---")
-    st.subheader("💡 Why Two Segments?")
     st.markdown("""
-    - Simplifies decision-making
-    - Aligns with natural customer split (spending median)
-    - Enables clear, actionable marketing strategies
+        - **Source:** Kaggle – Customer Personality Analysis Dataset  
+        - **Timeline:** last 2 years  
+          (campaign responses, purchases, and spending amounts)
     """)
+
+    with st.expander("💡**Learn More About the Dataset**", expanded=False):
+        st.markdown("""
+
+        ### 📊 Features Table
+
+        | **Feature** | **Meaning** | **Why It Matters** |
+        |-------------|-------------|---------------------|
+        | **Age** | Calculated as `2024 - Year_Birth` | Helps segment younger vs older shopper groups. |
+        | **Has_Children** | 1 if Kidhome + Teenhome > 0 | Identifies family-oriented customers with different needs. |
+        | **TotalMnt** | Total amount spent across all product categories (2 yrs) | Measures overall customer value & spending intensity. |
+        | **TotalPurchases** | Sum of Web, Catalog, and Store purchases | Captures total shopping activity across all channels. |
+        | **TotalAcceptedCmp** | Total number of campaigns accepted | Reveals how responsive a customer is to promotions. |
+        | **Days_Customer** | Days since customer joined | Shows tenure: new vs long-term customers. |
+
+        These features were created to improve segmentation quality and make patterns easier to understand.
+        """)
     
     df_full = preprocess_for_eda(df_raw)
+
+    st.markdown("---") 
+
+    st.markdown("""
+    ### 📦 Our Data Types
+
+    <div style='display: flex; flex-wrap: wrap; gap: 20px;'>
+
+    <div style='flex: 1; min-width: 230px; background: #faf9f6; padding: 14px; border-radius: 10px; border: 1px solid #e5decf;'>
+        <h4 style='margin: 0;'>🛒 Purchases</h4>
+        <p style='margin-top: 6px;'>Store, online, and catalog transactions.</p>
+    </div>
+
+    <div style='flex: 1; min-width: 230px; background: #faf9f6; padding: 14px; border-radius: 10px; border: 1px solid #e5decf;'>
+        <h4 style='margin: 0;'>📊 Demographics</h4>
+        <p style='margin-top: 6px;'>Age, income, education, family size, household type.</p>
+    </div>
+
+    <div style='flex: 1; min-width: 230px; background: #faf9f6; padding: 14px; border-radius: 10px; border: 1px solid #e5decf;'>
+        <h4 style='margin: 0;'>🌐 Web Engagement</h4>
+        <p style='margin-top: 6px;'>Monthly visits, browsing intensity, digital activity.</p>
+    </div>
+
+    <div style='flex: 1; min-width: 230px; background: #faf9f6; padding: 14px; border-radius: 10px; border: 1px solid #e5decf;'>
+        <h4 style='margin: 0;'>📣 Campaign Responses</h4>
+        <p style='margin-top: 6px;'>Historical acceptance patterns across campaigns.</p>
+    </div>
+
+    <div style='flex: 1; min-width: 230px; background: #faf9f6; padding: 14px; border-radius: 10px; border: 1px solid #e5decf;'>
+        <h4 style='margin: 0;'>🎁 Basket Spend Categories</h4>
+        <p style='margin-top: 6px;'>Wine, meat, fruits, sweets, fish, and premium products.</p>
+    </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.subheader("🚀 Getting Started")
+    st.markdown("""
+        This system uses machine learning to segment grocery retail customers into **two clear and meaningful groups** based on spending behavior, engagement, and promotion responsiveness:
+
+        - **👨‍👩‍👧‍👦 Budget Conscious Parent** – Value-conscious, price-sensitive shoppers focused on essentials  
+        - **💎 Responsive High Spenders** – Higher-income, brand-loyal shoppers who respond well to promotions and premium offers
+
+        This two segment approach:
+        - Simplifies decision-making for marketing teams  
+        - Reflects the natural divide found in the customer dataset (based on spending median)  
+        - Enables highly targeted communication, loyalty programs, and product recommendations  
+        - Helps improve retention, boost ROI, and optimize promotional investments  
+
+        By understanding the differences between these customer groups, businesses can turn complex customer data into **clear, actionable insights**.
+    """)
+
     
 # CUSTOMER DASHBOARD
 elif page == "Customer Dashboard":
@@ -1045,7 +1190,7 @@ elif page == "Customer Dashboard":
             # Define rich, actionable insights per cluster
             cluster_insights = {
                 0: {
-                    "name": "👨‍👩‍👧‍👦 Budget-Conscious Parent",
+                    "name": "👨‍👩‍👧‍👦 Budget Conscious Parent",
                     "profile": [
                         "  **Family-oriented**, often with children at home",
                         "  **Frequent but low-spend** transactions — necessity-driven",
@@ -1093,65 +1238,74 @@ elif page == "Customer Dashboard":
 
         def display_cluster(cluster_id):
             insight = cluster_insights[cluster_id]
-            model_id = cluster_id + 1  # show Cluster 1 / Cluster 2
+            model_id = cluster_id + 1
 
-            st.markdown('<div class="eda-card">', unsafe_allow_html=True)
+            card = st.container()
+            with card:
+                st.markdown("""
+                <div class="eda-card" style="padding-top: 15px !important;">
+                """, unsafe_allow_html=True)
 
-            # Header with forced line break
-            st.markdown(
-                f"""
-                <h3 style='margin-bottom: 10px;'>
-                    Cluster {model_id}:<br>
-                    <span style="font-weight:700;">{insight['name']}</span>
-                </h3>
-                """,
-                unsafe_allow_html=True
-            )
+                # Header
+                st.markdown(
+                    f"""
+                    <h3 style='margin-bottom: 10px;'>
+                        Cluster {model_id}:<br>
+                        <span style="font-weight:700;">{insight['name']}</span>
+                    </h3>
+                    """,
+                    unsafe_allow_html=True
+                )
 
-            # Behavioral Profile
-            st.markdown("### 👤 Behavioral Profile")
-            for point in insight["profile"]:
-                st.markdown(f"- {point}")
-
-            # Why This Matters 
-            with st.expander("💡 Why This Matters"):
-                for point in insight["why_it_matters"]:
+                # Behavioral Profile
+                st.markdown("### 👤 Behavioral Profile")
+                for point in insight["profile"]:
                     st.markdown(f"- {point}")
 
-            # Radar Chart
-            categories = list(cluster_profiles.columns)
-            values = cluster_profiles.loc[cluster_id].values.flatten().tolist()
-            values += values[:1]
+                # Compact Radar Chart (reduced height, tighter padding)
+                categories = list(cluster_profiles.columns)
+                values = cluster_profiles.loc[cluster_id].values.flatten().tolist()
+                values += values[:1]
 
-            fig = go.Figure(
-                data=go.Scatterpolar(
-                    r=values,
-                    theta=categories + [categories[0]],
-                    fill='toself',
-                    line_color=COLORS["accent"],
-                    hoverinfo='text',
-                    text=[f"{cat}: {val:.2f}" for cat, val in zip(categories, cluster_profiles.loc[cluster_id])],
+                fig = go.Figure(
+                    data=go.Scatterpolar(
+                        r=values,
+                        theta=categories + [categories[0]],
+                        fill='toself',
+                        line_color=COLORS["accent"],
+                        hoverinfo='text',
+                        text=[f"{cat}: {val:.2f}" for cat, val in zip(categories, cluster_profiles.loc[cluster_id])]
+                    )
                 )
-            )
 
-            fig.update_layout(
-                polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
-                showlegend=False,
-                title="Behavioral Profile",
-                plot_bgcolor=COLORS["card_bg"],
-                paper_bgcolor=COLORS["card_bg"],
-                font_color=COLORS["text_primary"],
-            )
+                fig.update_layout(
+                    polar=dict(
+                        radialaxis=dict(visible=True, range=[0, 1])
+                    ),
+                    showlegend=False,
+                    title="Behavioral Profile",
+                    plot_bgcolor=COLORS["card_bg"],
+                    paper_bgcolor=COLORS["card_bg"],
+                    font_color=COLORS["text_primary"],
+                    height=260,          
+                    margin=dict(l=20, r=20, t=40, b=20)  
+                )
 
-            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+                st.plotly_chart(fig, use_container_width=True)
+                
+                #close card div
+                st.markdown("</div>", unsafe_allow_html=True) 
+                
+                # Why This Matters
+                with st.expander("💡 **Why This Matters**", expanded=False):
+                    for point in insight["why_it_matters"]:
+                        st.markdown(f"- {point}")
 
-            # Marketing Strategy
-            with st.expander("💼 Recommended Marketing Strategy"):
-                st.markdown("#### Actionable Tactics:")
-                for tactic in insight["marketing"]:
-                    st.markdown(f"- {tactic}")
-
-            st.markdown("</div>", unsafe_allow_html=True)
+                # Marketing Strategy
+                with st.expander("💼 **Recommended Marketing Strategy**"):
+                    st.markdown("#### Actionable Tactics:")
+                    for tactic in insight["marketing"]:
+                        st.markdown(f"- {tactic}")
 
         # Render Columns Cleanly 
         col1, col2 = st.columns(2)
@@ -1233,65 +1387,124 @@ elif page == "Customer Dashboard":
         )
             
         st.plotly_chart(fig, use_container_width=True)
-            
+        with st.expander("ℹ️ **Understanding the Heatmap**", expanded=False):
+            st.markdown("""
+            ##### 🧩 What Is This?
 
-# PREDICT CUSTOMER SEGMENT
+            - **Purpose:** Compare how different customer clusters behave across key demographic  
+              and behavioral features.
+            - **Rows:** Represent customer clusters.
+            - **Columns:** Represent features.
+            - **Color Intensity:** The deeper the color, the higher the normalized value of that  
+              feature within the cluster.
+
+            ##### 🔎 Key Defining Characteristics Shown
+            1. **Children**  
+            Indicates whether the customer has children in the household.
+            2. **Total Purchases**  
+               Shows overall purchase volume across all channels (web, store, catalog).
+            3. **Monthly Number of Website Visits**  
+               Reflects browsing frequency and digital engagement level.
+            """)
+
+
+        # ✅ CTA Container
+        cta = st.container()
+        with cta:
+            st.markdown("""
+            <div style="
+                background-color: #C8E5EE;
+                padding: 20px;
+                border-radius: 12px;
+                border: 1px solid #b8e6b8;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+                text-align: center;
+                margin-top: 15px;
+                margin-bottom: 25px;
+            ">
+                <h3 style="
+                    color: #2a5d2a;
+                    font-weight: 700;
+                    margin-bottom: 6px;
+                ">
+                    Can't predict the customer profile of a new shopper?
+                </h3>
+                <p style="
+                    color: #3d6e3d;
+                    font-size: 1.05rem;
+                    margin-bottom: 16px;
+                ">
+                    We can help you.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        go_predict = st.button(" Try the Prediction Tool 😉")
+
+        if go_predict:
+            st.session_state["page"] = "Predict Customer Segment"
+            st.rerun()   
+
+#  PREDICT CUSTOMER SEGMENT PAGE
 elif page == "Predict Customer Segment":
     st.title("🔮 Predict Customer Segment")
+
     scaler, pca, clusterer, cluster_profiles, supervised_model = load_models()
+
     if scaler is None or cluster_profiles is None:
         st.error("Models or cluster profiles not loaded.")
         st.stop()
 
-    # Define rich descriptions and insights 
+    #  INSIGHTS FOR CLUSTER
     cluster_insights = {
-        1: {
-            "name": " 💰Responsive High Spenders",
+        0: {
+            "name": "👨‍👩‍👧‍👦 Budget Conscious Parent",
             "profile": [
-                "  **Higher income** and **younger** demographic",
-                "  **Actively engages** with promotional campaigns",
-                " 💵 **High total spending** and **responds to 2+ campaigns** on average",
-                " ✨ Prefers **experiential, premium** offerings",
-                " 📣 Open to **experimentation** and new product discovery"
+                "**Family-oriented** with children at home",
+                "**Frequent but low-spend** shopping",
+                "**Loyal** long-term customers",
+                "🌐 Visits website often for comparison",
+                "🔕 Ignores most promotional campaigns"
             ],
             "why_it_matters": [
-                " Campaigns matches their lifestyle, seeing offers as **value**",
-                " Digital engagement **directly converts** — ideal for retargeting",
-                " **Growth engine** for new premium launches"
+                "Not disengaged — just **filtering noise**",
+                "Promos fail because they feel irrelevant",
+                "They value **utility, trust, convenience**",
+                "They're a **retention cornerstone**"
             ],
             "marketing": [
-                "🎯 **Personalize dynamically**: “Recommended for you”, “Based on your style”",
-                "✨ Offer **flash sales, early access, VIP tiers** — exclusivity drives action",
-                "📣 Use **social proof**: bestsellers, reviews, influencer tags",
-                "🛒 **Upsell/cross-sell** at checkout ",
-                "📲 Retarget with **lifestyle-aligned** creatives (not just discounts)"
+                "Contextual nudges (recently viewed items)",
+                "🔍 Improve filtering & search",
+                "🎖️ Display loyalty points frequently",
+                "📧 Helpful emails: restocks, reminders",
+                "🚫 Avoid heavy discount spam"
             ]
         },
-        2: {
-            "name": "👨‍👩‍👧‍👦 Budget-Conscious Parent",
+        1: {
+            "name": "💰 Responsive High Spenders",
             "profile": [
-                "  **Family-oriented**, often with children at home",
-                "  **Frequent but low-spend** transactions — necessity-driven",
-                "  **Long-term, loyal** customer ",
-                "🌐 **Visits website often** — uses it for research/comparison",
-                "🔕 **Ignores most promotional campaigns** — filters out “noise”"
+                "**Higher income** and **younger** demographic",
+                "**Actively engages** with promotional campaigns",
+                "💵 High total spending & responds to **2+ campaigns**",
+                "✨ Prefers experiential & premium offerings",
+                "📣 Open to trying new products"
             ],
             "why_it_matters": [
-                " They’re **not disengaged** — they’re **actively browsing** but avoiding hype",
-                " Promotions fail because they feel **irrelevant or overwhelming**",
-                " They want **utility, trust, and convenience** — not flashy banners",
-                " They’re your **retention core** — but need the right triggers to convert"
+                "They view campaigns as **value**, not noise",
+                "Digital engagement **converts strongly**",
+                "Core group for premium product launches"
             ],
             "marketing": [
-                "  Use **contextual nudges**: “Based on your recent views…”, “Top picks for families like yours”",
-                "🔍 **Improve filtering & search** — help them find what they need in <10 seconds",
-                "🎖️ **Show loyalty points** on every visit/purchase — reinforce long-term value",
-                "📧 Trigger **helpful emails**: restock alerts, “you viewed this last week”, abandoned cart",
-                "🚫 **Avoid discount-heavy messaging** — focus on **practicality, reliability, and ease**"
+                "🎯 Personalized recommendations",
+                "✨ VIP tiers, early access, exclusives",
+                "📣 Use reviews, influencers, social proof",
+                "🛒 Upsell/cross-sell at checkout",
+                "📲 Retarget with lifestyle content"
             ]
         }
     }
 
+    #  FORM
     with st.form("predict_form"):
         col1, col2 = st.columns(2)
         with col1:
@@ -1299,62 +1512,60 @@ elif page == "Predict Customer Segment":
             income = st.number_input("Annual Income ($)", min_value=0, value=50000, step=1000)
             has_children = st.selectbox("Has Children?", [0, 1], format_func=lambda x: "No" if x == 0 else "Yes")
             total_mnt = st.number_input("Total Spending ($)", min_value=0, value=600, step=50)
+
         with col2:
             total_purchases = st.number_input("Total Purchases", min_value=0, value=20)
             web_visits = st.number_input("Monthly Web Visits", min_value=0, value=5)
-            total_cmp = st.number_input(
-                "Accepted Campaigns (0–6)",
-                min_value=0,
-                max_value=6,
-                value=1,
-                help="Total campaigns accepted (including last campaign 'Response')"
-            )
+            total_cmp = st.number_input("Accepted Campaigns (0–6)", min_value=0, max_value=6, value=1)
             days_customer = st.number_input("Days as Customer", min_value=0, value=365)
+
         submitted = st.form_submit_button("🚀 Predict Segment")
 
+    # PERFORM PREDICTION
     if submitted:
-        input_data = np.array([[age, income, has_children, total_mnt, total_purchases,
-                                web_visits, total_cmp, days_customer]])
         try:
+            input_data = np.array([[age, income, has_children, total_mnt, total_purchases,
+                                    web_visits, total_cmp, days_customer]])
+
+            # Scale → PCA → Predict
             scaled = scaler.transform(input_data)
 
-            if supervised_model is not None:
-                pred_label = int(supervised_model.predict(scaled)[0])
-            else:
-                reduced = pca.transform(scaled)
-                pred_label = int(clusterer.predict(reduced)[0])
+            pred_label = int(supervised_model.predict(scaled)[0])
 
-            # Get insight data
+            # Convert internal cluster (0,1) → display as (1,2)
+            display_cluster_id = pred_label + 1
+
             insight = cluster_insights[pred_label]
             segment_name = insight["name"]
 
-            # Confidence 
+            #  Confidence Score
             confidence_msg = ""
-            if supervised_model is not None and hasattr(supervised_model, "predict_proba"):
+            if hasattr(supervised_model, "predict_proba"):
                 proba = supervised_model.predict_proba(scaled)[0]
                 confidence = max(proba) * 100
                 confidence_msg = f" (Confidence: **{confidence:.1f}%**)"
 
-            st.success(f"### 🎯 Predicted Segment: **{segment_name}**{confidence_msg}")
+            #  Display Result
+            st.success(
+                f"### 🎯 Predicted Segment: **Cluster {display_cluster_id} – {segment_name}** {confidence_msg}"
+            )
 
-            # --- Profile Summary ---
+            #  PROFILE
             st.markdown("### 👤 Customer Profile")
             for point in insight["profile"]:
                 st.markdown(f"- {point}")
 
-            # --- Why This Matters ---
+            #  WHY IT MATTERS
             with st.expander("💡 Why This Matters"):
                 for point in insight["why_it_matters"]:
                     st.markdown(f"- {point}")
 
-            # --- Radar Chart ---
+            #  RADAR CHART
             st.markdown("### 📊 Behavioral Radar Chart")
+
             categories = list(cluster_profiles.columns)
-            N = len(categories)
-            angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
-            values = cluster_profiles.loc[pred_label].values.flatten().tolist()
+            values = cluster_profiles.loc[pred_label].tolist()
             values += values[:1]
-            angles += angles[:1]
 
             fig = go.Figure(
                 data=go.Scatterpolar(
@@ -1362,31 +1573,29 @@ elif page == "Predict Customer Segment":
                     theta=categories + [categories[0]],
                     fill='toself',
                     line_color=COLORS["accent"],
-                    hoverinfo='text',
-                    text=[f"{cat}: {val:.2f}" for cat, val in zip(categories, cluster_profiles.loc[pred_label])]
                 )
             )
+
             fig.update_layout(
-                polar=dict(
-                    radialaxis=dict(visible=True, range=[0, 1]),
-                    angularaxis=dict(direction="clockwise")
-                ),
+                title=f"Cluster {display_cluster_id} Behavioral Profile",
+                polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
                 showlegend=False,
-                title=f"Cluster {pred_label} Behavioral Profile",
-                plot_bgcolor=COLORS["background"],
                 paper_bgcolor=COLORS["background"],
+                plot_bgcolor=COLORS["background"],
                 font_color=COLORS["text_primary"]
             )
+
             st.plotly_chart(fig, use_container_width=True)
 
-            # --- Marketing Strategy (as expander below radar) ---
+            # MARKETING STRATEGY
             with st.expander("💼 Recommended Marketing Strategy"):
                 st.markdown("#### Actionable Tactics:")
                 for tactic in insight["marketing"]:
                     st.markdown(f"- {tactic}")
 
         except Exception as e:
-            st.error(f"Prediction error: {e}") 
+            st.error(f"Prediction error: {e}")
+ 
 
 # Footer
 st.markdown("---")
