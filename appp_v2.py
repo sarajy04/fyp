@@ -309,6 +309,7 @@ def load_model_metrics():
 
 # Login Page
 if not st.session_state.logged_in:
+    st.markdown("---")
     st.markdown("""
     <h1 style='font-size:1.8rem; font-weight:600;'>
     🔐 CoreCart <span style='font-size:1rem; color:#6b6b6b;'>| Your core customers. Your competitive edge.</span>
@@ -1626,18 +1627,15 @@ elif page == "Predict Customer Segment":
 
             #  Display Result
             st.success(
-                f"### 🎯 Predicted Segment: **Cluster {display_cluster_id} – {segment_name}** {confidence_msg}"
+                f"### 🎯 Predicted Segment:\n"
+                f"**Cluster {display_cluster_id} – {segment_name}**\n"
+                f"{confidence_msg}"
             )
 
             #  PROFILE
             st.markdown("### 👤 Customer Profile")
             for point in insight["profile"]:
                 st.markdown(f"- {point}")
-
-            #  WHY IT MATTERS
-            with st.expander("💡 Why This Matters"):
-                for point in insight["why_it_matters"]:
-                    st.markdown(f"- {point}")
 
             #  RADAR CHART
             st.markdown("### 📊 Behavioral Radar Chart")
@@ -1666,8 +1664,13 @@ elif page == "Predict Customer Segment":
 
             st.plotly_chart(fig, use_container_width=True)
 
+            #  WHY IT MATTERS
+            with st.expander("💡 **Why This Matters**"):
+                for point in insight["why_it_matters"]:
+                    st.markdown(f"- {point}")
+
             # MARKETING STRATEGY
-            with st.expander("💼 Recommended Marketing Strategy"):
+            with st.expander("💼 **Recommended Marketing Strategy**"):
                 st.markdown("#### Actionable Tactics:")
                 for tactic in insight["marketing"]:
                     st.markdown(f"- {tactic}")
