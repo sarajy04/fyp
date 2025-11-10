@@ -332,15 +332,20 @@ if not st.session_state.logged_in:
 # GLOBAL HEADER BANNER
 if st.session_state.logged_in:
     header_image_path = "header.jpeg"
-
     try:
         with open(header_image_path, "rb") as f:
             img_data = f.read()
         img_base64 = base64.b64encode(img_data).decode()
         bg_image = f"data:image/jpeg;base64,{img_base64}"
         header_bg = f"url('{bg_image}')"
-    except:
+    except FileNotFoundError:
+        st.warning("⚠️ `header.jpeg` not found — using fallback color.")
         header_bg = "#d88c4f"
+    except Exception as e:
+        st.warning(f"⚠️ Error loading header: {e}")
+        header_bg = "#d88c4f"
+
+    st.markdown(f""" ... """, unsafe_allow_html=True)
 
     st.markdown(f"""
     <style>
