@@ -823,21 +823,21 @@ elif page == "Customer Dashboard":
     with col1:
         st.markdown(f"""
         <div style="{kpi_style}">
-            <h4>💰 Avg. Spending</h4>
+            <h4>💰 Average Spending</h4>
             <p style="font-size: 20px; font-weight: bold;">${avg_spent:,.0f}</p>
         </div>
         """, unsafe_allow_html=True)
     with col2:
         st.markdown(f"""
         <div style="{kpi_style}">
-            <h4>👤 Avg. Age</h4>
+            <h4>👤 Average Age</h4>
             <p style="font-size: 20px; font-weight: bold;">{avg_age:.1f}</p>
         </div>
         """, unsafe_allow_html=True)
     with col3:
         st.markdown(f"""
         <div style="{kpi_style}">
-            <h4>💳 Avg. Income</h4>
+            <h4>💳 Average Income</h4>
             <p style="font-size: 20px; font-weight: bold;">${avg_income:,.0f}</p>
         </div>
         """, unsafe_allow_html=True)

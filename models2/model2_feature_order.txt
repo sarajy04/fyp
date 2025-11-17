@@ -1,8 +1,0 @@
-Age
-Income
-Has_Children
-TotalMnt
-TotalPurchases
-NumWebVisitsMonth
-TotalAcceptedCmp
-Days_Customer
