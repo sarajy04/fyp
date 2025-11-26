@@ -607,8 +607,7 @@ if page == "Home":
         st.error("Dataset not found. Place `marketing_campaign.csv` in the project root.")
     st.markdown("""
         - **Source:** Kaggle – Customer Personality Analysis Dataset  
-        - **Timeline:** last 2 years  
-          (campaign responses, purchases, and spending amounts)
+        - **Timeline:** last 2 years (2024-2022)  
     """)
 
     with st.expander("💡**Learn More About the Dataset**", expanded=False):
@@ -620,8 +619,10 @@ if page == "Home":
         |-------------|-------------|---------------------|
         | **Age** | Calculated as `2024 - Year_Birth` | Helps segment younger vs older shopper groups. |
         | **Has_Children** | 1 if Kidhome + Teenhome > 0 | Identifies family-oriented customers with different needs. |
+        | **Income** | Customer's yearly household income | Helps segment higher vs lower income shopper groups. |
         | **TotalMnt** | Total amount spent across all product categories (2 yrs) | Measures overall customer value & spending intensity. |
         | **TotalPurchases** | Sum of Web, Catalog, and Store purchases | Captures total shopping activity across all channels. |
+        | **NumWebVisitsMonth** | Monthly website visits | Indicates digital engagement level. |
         | **TotalAcceptedCmp** | Total number of campaigns accepted | Reveals how responsive a customer is to promotions. |
         | **Days_Customer** | Days since customer joined | Shows tenure: new vs long-term customers. |
 
